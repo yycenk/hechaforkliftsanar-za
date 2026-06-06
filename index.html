@@ -410,7 +410,7 @@
         <!-- Arızalar Sekmesi -->
         <div id="arizaTab" class="tab-content active">
             <div class="fault-section"><div class="section-header"><h2><i class="fas fa-clock"></i> BEKLEYEN ARIZALAR <span class="badge-count" id="waitingCount">0</span></h2></div>
-                <div class="table-wrapper"><table class="data-table" id="waitingTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="waitingBody"></tbody></tr></div></div>
+                <div class="table-wrapper"><table class="data-table" id="waitingTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="waitingBody"></tbody></table></div></div>
             <div class="fault-section"><div class="section-header"><h2><i class="fas fa-gear"></i> İŞLEMDEKİ ARIZALAR <span class="badge-count" id="progressCount">0</span></h2></div>
                 <div class="table-wrapper"><table class="data-table" id="progressTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="progressBody"></tbody></table></div></div>
             <div class="fault-section"><div class="section-header"><h2><i class="fas fa-check-circle"></i> TAMAMLANAN ARIZALAR <span class="badge-count" id="completedCount">0</span></h2></div>
@@ -602,7 +602,7 @@
         }
     }
     
-    // SADELEŞTİRİLMİŞ WHATSAPP MESAJI (emoji yok, sade teknik)
+    // SADELEŞTİRİLMİŞ WHATSAPP MESAJI (emoji yok)
     function sendWhatsApp(fault) {
         if (!fault.teknisyen) { alert("Teknisyen atanmamış!"); return; }
         let tel = getTeknisyenTel(fault.teknisyen);
@@ -719,6 +719,7 @@
         renderBody(progressRaw, "progressBody", "progress");
         renderBody(completedRaw, "completedBody", "completed");
         attachTableEvents();
+        attachSortListeners();  // Sıralama dinleyicilerini yeniden ekle
         updateSortIcons('waitingTable', sortState.waiting);
         updateSortIcons('progressTable', sortState.progress);
         updateSortIcons('completedTable', sortState.completed);
@@ -739,19 +740,25 @@
     }
     
     function attachSortListeners() {
-        ['waitingTable', 'progressTable', 'completedTable'].forEach(tableId => {
-            let table = document.getElementById(tableId);
+        const tableIds = ['waitingTable', 'progressTable', 'completedTable'];
+        tableIds.forEach(tableId => {
+            const table = document.getElementById(tableId);
             if (!table) return;
-            let headers = table.querySelectorAll('th');
+            const headers = table.querySelectorAll('th');
             headers.forEach(th => {
-                let sortKey = th.getAttribute('data-sort');
+                const sortKey = th.getAttribute('data-sort');
                 if (!sortKey || sortKey === 'islem' || sortKey === 'whatsapp') return;
                 th.style.cursor = 'pointer';
+                // Eski dinleyiciyi kaldır
                 th.removeEventListener('click', th._sortHandler);
-                let handler = () => {
-                    let state = sortState[tableId === 'waitingTable' ? 'waiting' : (tableId === 'progressTable' ? 'progress' : 'completed')];
-                    if (state.column === sortKey) state.direction = state.direction === 'asc' ? 'desc' : 'asc';
-                    else { state.column = sortKey; state.direction = 'asc'; }
+                const handler = () => {
+                    const state = sortState[tableId === 'waitingTable' ? 'waiting' : (tableId === 'progressTable' ? 'progress' : 'completed')];
+                    if (state.column === sortKey) {
+                        state.direction = state.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        state.column = sortKey;
+                        state.direction = 'asc';
+                    }
                     renderTables();
                 };
                 th._sortHandler = handler;
@@ -908,7 +915,6 @@
             buildMonthSlicer();
             if (document.getElementById("raporTab").classList.contains("active")) renderMonthlyReport(currentSelectedMonth);
             
-            // Eğer hiç veri yoksa varsayılanları ekle
             if (!initialDataLoaded && (!data || Object.keys(data).length === 0)) {
                 initialDataLoaded = true;
                 const promises = DEFAULT_FAULTS.map(fault => database.ref('faults').push(fault));
