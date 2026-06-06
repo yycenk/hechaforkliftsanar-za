@@ -287,35 +287,6 @@
             .firm-stats-grid { grid-template-columns: 1fr; }
         }
     </style>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig = {
- apiKey: "AIzaSyBSHVgcvx64rFmySgSj3ATMEQ_XS1d1B04",
- authDomain: "arizatakiphecha.firebaseapp.com",
- projectId: "arizatakiphecha",
- storageBucket: "arizatakiphecha.firebasestorage.app",
- messagingSenderId: "611036660735",
- appId: "1:611036660735:web:83427cc97ffbc755b59dca",
- measurementId: "G-DFBHLGQLZ5"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-window.cloudDB = {
- async load(){
-   const snap = await getDoc(doc(db,"system","main"));
-   return snap.exists() ? snap.data() : null;
- },
- async save(data){
-   await setDoc(doc(db,"system","main"), data, {merge:true});
- }
-};
-</script>
-
 </head>
 <body>
 <div class="container">
@@ -519,25 +490,53 @@ window.cloudDB = {
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    function loadData() {
-        let stored = localStorage.getItem("forklift_faults_v12");
-        if (stored) faultsArray = JSON.parse(stored);
-        else faultsArray = JSON.parse(JSON.stringify(DEFAULT_FAULTS));
-        let storedTek = localStorage.getItem("forklift_teknisyen_v12");
-        if (storedTek) teknisyenler = JSON.parse(storedTek);
-        else teknisyenler = [
-            { id: "t1", ad: "Atilla", tel: "905551112233" },
-            { id: "t2", ad: "Serkan K.", tel: "905322223344" },
-            { id: "t3", ad: "Umut", tel: "905334445566" },
-            { id: "t4", ad: "Akif", tel: "905441234567" }
-        ];
+    async function loadData() {
+        // 1) Firebase'den yükle
+        try {
+            const cloud = await window.cloudDB.load();
+            if (cloud && cloud.faults && cloud.faults.length > 0) {
+                faultsArray = cloud.faults;
+                teknisyenler = cloud.teknisyenler || [];
+            } else {
+                // İlk kullanım: varsayılan verileri yükle ve Firebase'e kaydet
+                faultsArray = JSON.parse(JSON.stringify(DEFAULT_FAULTS));
+                teknisyenler = [
+                    { id: "t1", ad: "Atilla", tel: "905551112233" },
+                    { id: "t2", ad: "Serkan K.", tel: "905322223344" },
+                    { id: "t3", ad: "Umut", tel: "905334445566" },
+                    { id: "t4", ad: "Akif", tel: "905441234567" }
+                ];
+                await window.cloudDB.save({ faults: faultsArray, teknisyenler: teknisyenler });
+            }
+        } catch(e) {
+            // Firebase erişilemezse localStorage fallback
+            console.warn("Firebase bağlantı hatası, localStorage kullanılıyor:", e);
+            let stored = localStorage.getItem("forklift_faults_v12");
+            if (stored) faultsArray = JSON.parse(stored);
+            else faultsArray = JSON.parse(JSON.stringify(DEFAULT_FAULTS));
+            let storedTek = localStorage.getItem("forklift_teknisyen_v12");
+            if (storedTek) teknisyenler = JSON.parse(storedTek);
+            else teknisyenler = [
+                { id: "t1", ad: "Atilla", tel: "905551112233" },
+                { id: "t2", ad: "Serkan K.", tel: "905322223344" },
+                { id: "t3", ad: "Umut", tel: "905334445566" },
+                { id: "t4", ad: "Akif", tel: "905441234567" }
+            ];
+        }
         updateFirmalarFromFaults();
         saveAll();
     }
-    function saveAll() {
+    async function saveAll() {
+        // localStorage yedek
         localStorage.setItem("forklift_faults_v12", JSON.stringify(faultsArray));
         localStorage.setItem("forklift_teknisyen_v12", JSON.stringify(teknisyenler));
         localStorage.setItem("forklift_firmalar_v12", JSON.stringify(firmalar));
+        // Firebase'e kaydet
+        try {
+            await window.cloudDB.save({ faults: faultsArray, teknisyenler: teknisyenler });
+        } catch(e) {
+            console.warn("Firebase kaydetme hatası:", e);
+        }
     }
     function updateFirmaDatalist() {
         let datalist = document.getElementById("firmaListesi");
@@ -915,8 +914,8 @@ window.cloudDB = {
         }));
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        loadData(); updateTeknisyenDropdown(); renderTables(); attachSortListeners(); buildMonthSlicer();
+    document.addEventListener("DOMContentLoaded", async () => {
+        await loadData(); updateTeknisyenDropdown(); renderTables(); attachSortListeners(); buildMonthSlicer();
         document.getElementById("newFaultBtn").addEventListener("click", newFault);
         document.getElementById("modalCancelBtn").addEventListener("click", closeFaultModal);
         document.getElementById("faultForm").addEventListener("submit", saveFault);
@@ -963,46 +962,5 @@ window.cloudDB = {
         });
     });
 </script>
-
-<div id="loginOverlay" style="position:fixed;inset:0;background:#f4f7fb;display:flex;justify-content:center;align-items:center;z-index:999999">
- <div style="background:white;padding:30px;border-radius:16px;width:340px">
-   <h2>HECHA Giriş</h2>
-   <input id="loginUser" placeholder="Kullanıcı Adı" style="width:100%;padding:10px;margin:5px 0">
-   <input id="loginPass" type="password" placeholder="Şifre" style="width:100%;padding:10px;margin:5px 0">
-   <button id="loginBtn" style="width:100%;padding:10px">Giriş Yap</button>
-   <div id="loginError" style="color:red;margin-top:8px"></div>
- </div>
-</div>
-
-<script>
-const USERS = {
- "gülnaz":"2314",
- "doğan":"0730"
-};
-
-document.addEventListener("DOMContentLoaded", function(){
-
-  if(sessionStorage.getItem("hechaUser")){
-      const o=document.getElementById("loginOverlay");
-      if(o) o.style.display="none";
-  }
-
-  const btn=document.getElementById("loginBtn");
-  if(btn){
-    btn.addEventListener("click", function(){
-      const u=document.getElementById("loginUser").value.trim().toLowerCase();
-      const p=document.getElementById("loginPass").value.trim();
-
-      if(USERS[u]===p){
-        sessionStorage.setItem("hechaUser",u);
-        document.getElementById("loginOverlay").style.display="none";
-      }else{
-        document.getElementById("loginError").innerText="Kullanıcı adı veya şifre hatalı";
-      }
-    });
-  }
-});
-</script>
-
 </body>
 </html>
