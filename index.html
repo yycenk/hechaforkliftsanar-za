@@ -57,7 +57,7 @@
             outline: none;
             background: transparent;
         }
-        .btn-icon, .btn-new, .btn-reset, .btn-logout {
+        .btn-icon, .btn-new, .btn-logout {
             padding: 0.5rem 1.2rem;
             border-radius: 60px;
             font-weight: 600;
@@ -73,10 +73,6 @@
         }
         .btn-new {
             background: linear-gradient(95deg, #1E3A5F, #2A5F7A);
-            color: white;
-        }
-        .btn-reset {
-            background: #dc3545;
             color: white;
         }
         .btn-logout {
@@ -401,7 +397,6 @@
                 <div class="user-welcome" id="userWelcome"></div>
                 <div class="search-area"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Firma, şehir, arıza..."></div>
                 <button class="btn-icon" id="teknisyenBtn"><i class="fas fa-users"></i> Teknisyenler</button>
-                <button class="btn-reset" id="resetDatabaseBtn"><i class="fas fa-trash-alt"></i> Veritabanını Sıfırla</button>
                 <button class="btn-new" id="newFaultBtn"><i class="fas fa-plus-circle"></i> Yeni Arıza</button>
                 <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</button>
             </div>
@@ -415,7 +410,7 @@
         <!-- Arızalar Sekmesi -->
         <div id="arizaTab" class="tab-content active">
             <div class="fault-section"><div class="section-header"><h2><i class="fas fa-clock"></i> BEKLEYEN ARIZALAR <span class="badge-count" id="waitingCount">0</span></h2></div>
-                <div class="table-wrapper"><table class="data-table" id="waitingTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="waitingBody"></tbody></table></div></div>
+                <div class="table-wrapper"><table class="data-table" id="waitingTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="waitingBody"></tbody></tr></div></div>
             <div class="fault-section"><div class="section-header"><h2><i class="fas fa-gear"></i> İŞLEMDEKİ ARIZALAR <span class="badge-count" id="progressCount">0</span></h2></div>
                 <div class="table-wrapper"><table class="data-table" id="progressTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="progressBody"></tbody></table></div></div>
             <div class="fault-section"><div class="section-header"><h2><i class="fas fa-check-circle"></i> TAMAMLANAN ARIZALAR <span class="badge-count" id="completedCount">0</span></h2></div>
@@ -607,29 +602,29 @@
         }
     }
     
+    // SADELEŞTİRİLMİŞ WHATSAPP MESAJI (emoji yok, sade teknik)
     function sendWhatsApp(fault) {
-    if (!fault.teknisyen) { alert("Teknisyen atanmamış!"); return; }
-    let tel = getTeknisyenTel(fault.teknisyen);
-    if (!tel) { alert("Teknisyen telefonu kayıtlı değil!"); return; }
-    const clean = (text) => text ? String(text).replace(/[&<>]/g, '').trim() : '-';
-    const waitingDays = calculateWaitingDays(fault);
-    let msg = `HECHA FORKLIFTSAN ARIZA BILDIRIMI\n` +
-              `Firma: ${clean(fault.firma)}\n` +
-              `Iletisim: ${clean(fault.iletisim)}\n` +
-              `Konum: ${clean(fault.konum)}\n` +
-              `Ariza: ${clean(fault.ariza)}\n` +
-              `Tarih: ${fault.tarih || '-'}\n` +
-              `Model: ${clean(fault.modelSeri)}\n` +
-              `Calisma Saati: ${clean(fault.calismaSaati)}\n` +
-              `Mudahale: ${clean(fault.mudahale)}\n` +
-              `Bekleme: ${waitingDays} gun\n` +
-              `Form No: ${clean(fault.formNo)}\n` +
-              `Sehir: ${clean(fault.sehir)}\n\n` +
-              `Mudahale ediniz.`;
-    let phone = tel.replace(/\D/g,'');
-    if (!phone.startsWith("90")) phone = "90" + phone;
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-}
+        if (!fault.teknisyen) { alert("Teknisyen atanmamış!"); return; }
+        let tel = getTeknisyenTel(fault.teknisyen);
+        if (!tel) { alert("Teknisyen telefonu kayıtlı değil!"); return; }
+        const clean = (text) => text ? String(text).replace(/[&<>]/g, '').trim() : '-';
+        const waitingDays = calculateWaitingDays(fault);
+        let msg = `HECHA FORKLIFTSAN ARIZA BILDIRIMI\n` +
+                  `Firma: ${clean(fault.firma)}\n` +
+                  `Iletisim: ${clean(fault.iletisim)}\n` +
+                  `Konum: ${clean(fault.konum)}\n` +
+                  `Ariza: ${clean(fault.ariza)}\n` +
+                  `Tarih: ${fault.tarih || '-'}\n` +
+                  `Model: ${clean(fault.modelSeri)}\n` +
+                  `Calisma Saati: ${clean(fault.calismaSaati)}\n` +
+                  `Mudahale: ${clean(fault.mudahale)}\n` +
+                  `Bekleme: ${waitingDays} gun\n` +
+                  `Form No: ${clean(fault.formNo)}\n` +
+                  `Sehir: ${clean(fault.sehir)}\n\n` +
+                  `Mudahale ediniz.`;
+        let phone = tel.replace(/\D/g,'');
+        if (!phone.startsWith("90")) phone = "90" + phone;
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
     function updateFirmaDatalist() {
@@ -703,11 +698,16 @@
                     <td class="action-btns"><button class="action-btn edit" data-id="${f.firebaseId}"><i class="fas fa-pen"></i></button>
                     <button class="action-btn delete" data-id="${f.firebaseId}"><i class="fas fa-trash-alt"></i></button></td>
                     <td>${(f.teknisyen && telOk) ? `<button class="whatsapp-btn" data-id="${f.firebaseId}"><i class="fab fa-whatsapp"></i> WhatsApp'a Gönder</button>` : `<button class="whatsapp-btn disabled" disabled><i class="fab fa-whatsapp"></i> Gönderilemez</button>`}</td>
-                    <td>${escapeHtml(f.tarih || "-")}</td><td><strong>${escapeHtml(f.firma || "-")}</strong></td>
-                    <td>${escapeHtml(f.sehir || "-")}</td><td>${escapeHtml(f.iletisim || "-")}</td>
-                    <td>${escapeHtml(f.modelSeri || "-")}</td><td>${escapeHtml(f.calismaSaati || "-")}</td>
-                    <td>${escapeHtml(f.ariza || "-")}</td><td>${escapeHtml(f.mudahale || "-")}</td>
-                    <td>${escapeHtml(f.teknisyen || "-")}</td><td>${escapeHtml(f.konum || "-")}</td>
+                    <td>${escapeHtml(f.tarih || "-")}</td>
+                    <td><strong>${escapeHtml(f.firma || "-")}</strong></td>
+                    <td>${escapeHtml(f.sehir || "-")}</td>
+                    <td>${escapeHtml(f.iletisim || "-")}</td>
+                    <td>${escapeHtml(f.modelSeri || "-")}</td>
+                    <td>${escapeHtml(f.calismaSaati || "-")}</td>
+                    <td>${escapeHtml(f.ariza || "-")}</td>
+                    <td>${escapeHtml(f.mudahale || "-")}</td>
+                    <td>${escapeHtml(f.teknisyen || "-")}</td>
+                    <td>${escapeHtml(f.konum || "-")}</td>
                     <td><span class="status-badge ${statusType}">${bekleme} gün</span></td>
                     <td>${f.bitisTarihi || "-"}</td>
                 </tr>`;
@@ -893,37 +893,8 @@
         document.querySelectorAll('.teknisyen-sil').forEach(btn => btn.addEventListener('click', () => database.ref('teknisyenler/' + btn.getAttribute('data-id')).remove()));
     }
 
-    // ---------- VERİTABANINI SIFIRLAMA (ESKİ KAYITLARI GERİ YÜKLEME) ----------
-    async function resetDatabase() {
-        if (!confirm("TÜM VERİLER SİLİNECEK ve 29 arıza kaydı ile varsayılan teknisyenler YENİDEN EKLENECEK. Onaylıyor musunuz?")) return;
-        try {
-            const faultsSnapshot = await database.ref('faults').once('value');
-            const faultsData = faultsSnapshot.val();
-            if (faultsData) {
-                const removes = Object.keys(faultsData).map(key => database.ref('faults/' + key).remove());
-                await Promise.all(removes);
-            }
-            const tekSnapshot = await database.ref('teknisyenler').once('value');
-            const tekData = tekSnapshot.val();
-            if (tekData) {
-                const tekRemoves = Object.keys(tekData).map(key => database.ref('teknisyenler/' + key).remove());
-                await Promise.all(tekRemoves);
-            }
-            const faultPromises = DEFAULT_FAULTS.map(fault => database.ref('faults').push(fault));
-            await Promise.all(faultPromises);
-            const tekPromises = DEFAULT_TEKNISYENLER.map(tek => database.ref('teknisyenler').push(tek));
-            await Promise.all(tekPromises);
-            
-            const toast = document.getElementById('toast');
-            toast.innerText = '✅ Veritabanı sıfırlandı, 29 kayıt ve teknisyenler eklendi.';
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 4000);
-        } catch (err) {
-            alert("Sıfırlama hatası: " + err.message);
-        }
-    }
-
     // ---------- FIREBASE VERİ AKIŞI (OTOMATİK) ----------
+    let initialDataLoaded = false;
     function loadDataFromFirebase() {
         database.ref('faults').on('value', (snapshot) => {
             const data = snapshot.val();
@@ -936,6 +907,18 @@
             renderTables();
             buildMonthSlicer();
             if (document.getElementById("raporTab").classList.contains("active")) renderMonthlyReport(currentSelectedMonth);
+            
+            // Eğer hiç veri yoksa varsayılanları ekle
+            if (!initialDataLoaded && (!data || Object.keys(data).length === 0)) {
+                initialDataLoaded = true;
+                const promises = DEFAULT_FAULTS.map(fault => database.ref('faults').push(fault));
+                Promise.all(promises).then(() => {
+                    const toast = document.getElementById('toast');
+                    toast.innerText = '✅ 29 adet örnek arıza kaydı eklendi.';
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 3000);
+                }).catch(err => console.error("Aktarma hatası:", err));
+            }
         });
         
         database.ref('teknisyenler').on('value', (snapshot) => {
@@ -947,6 +930,11 @@
             }
             updateTeknisyenDropdown();
             renderTables();
+            
+            if (!data || Object.keys(data).length === 0) {
+                const tekPromises = DEFAULT_TEKNISYENLER.map(tek => database.ref('teknisyenler').push(tek));
+                Promise.all(tekPromises).then(() => console.log("Varsayılan teknisyenler eklendi"));
+            }
         });
     }
 
@@ -970,7 +958,6 @@
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('appContent').classList.add('visible');
         document.getElementById('userWelcome').innerHTML = `<i class="fas fa-user-circle"></i> Hoşgeldin, ${currentUser}`;
-        // Firebase verilerini yükle (ilk kez geliyorsa)
         if (faultsArray.length === 0) loadDataFromFirebase();
     }
 
@@ -1001,13 +988,12 @@
         document.getElementById("loginPassword").addEventListener("keypress", (e) => { if (e.key === 'Enter') handleLogin(); });
         document.getElementById("logoutBtn").addEventListener("click", logout);
         
-        // Diğer butonlar sadece uygulama görünürken çalışır (event delegation veya kontrol)
-        document.getElementById("newFaultBtn")?.addEventListener("click", newFault);
-        document.getElementById("modalCancelBtn")?.addEventListener("click", closeFaultModal);
-        document.getElementById("faultForm")?.addEventListener("submit", saveFault);
-        document.getElementById("teknisyenBtn")?.addEventListener("click", openTeknisyenModal);
-        document.getElementById("teknisyenModalKapat")?.addEventListener("click", () => document.getElementById("teknisyenModal").classList.remove("active"));
-        document.getElementById("teknisyenEkleBtn")?.addEventListener("click", () => {
+        document.getElementById("newFaultBtn").addEventListener("click", newFault);
+        document.getElementById("modalCancelBtn").addEventListener("click", closeFaultModal);
+        document.getElementById("faultForm").addEventListener("submit", saveFault);
+        document.getElementById("teknisyenBtn").addEventListener("click", openTeknisyenModal);
+        document.getElementById("teknisyenModalKapat").addEventListener("click", () => document.getElementById("teknisyenModal").classList.remove("active"));
+        document.getElementById("teknisyenEkleBtn").addEventListener("click", () => {
             let ad = document.getElementById("yeniTeknisyenAd").value.trim();
             let tel = document.getElementById("yeniTeknisyenTel").value.trim();
             if (!ad || !tel) { alert("Ad ve telefon girin"); return; }
@@ -1018,8 +1004,7 @@
                 document.getElementById("yeniTeknisyenTel").value = "";
             }).catch(err => alert("Ekleme hatası: " + err));
         });
-        document.getElementById("resetDatabaseBtn")?.addEventListener("click", resetDatabase);
-        document.getElementById("searchInput")?.addEventListener("input", (e) => { searchTerm = e.target.value; renderTables(); });
+        document.getElementById("searchInput").addEventListener("input", (e) => { searchTerm = e.target.value; renderTables(); });
         
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -1044,7 +1029,7 @@
                 }
             });
         }
-        document.getElementById("modalDurum")?.addEventListener("change", function() {
+        document.getElementById("modalDurum").addEventListener("change", function() {
             if (this.value === "Tamamlandı" && !document.getElementById("modalBitisTarihi").value)
                 document.getElementById("modalBitisTarihi").value = new Date().toISOString().slice(0,10);
             else if (this.value !== "Tamamlandı") document.getElementById("modalBitisTarihi").value = "";
