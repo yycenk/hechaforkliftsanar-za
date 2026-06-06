@@ -11,6 +11,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
+        /* Tüm CSS kodunuz aynen burada - değişmedi */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
@@ -312,7 +313,7 @@
         <div class="fault-section"><div class="section-header"><h2><i class="fas fa-clock"></i> BEKLEYEN ARIZALAR <span class="badge-count" id="waitingCount">0</span></h2></div>
             <div class="table-wrapper"><table class="data-table" id="waitingTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="waitingBody"></tbody></table></div></div>
         <div class="fault-section"><div class="section-header"><h2><i class="fas fa-gear"></i> İŞLEMDEKİ ARIZALAR <span class="badge-count" id="progressCount">0</span></h2></div>
-            <div class="table-wrapper"><table class="data-table" id="progressTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th><tr></thead><tbody id="progressBody"></tbody></table></div></div>
+            <div class="table-wrapper"><table class="data-table" id="progressTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="progressBody"></tbody></table></div></div>
         <div class="fault-section"><div class="section-header"><h2><i class="fas fa-check-circle"></i> TAMAMLANAN ARIZALAR <span class="badge-count" id="completedCount">0</span></h2></div>
             <div class="table-wrapper"><table class="data-table" id="completedTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="completedBody"></tbody></table></div></div>
     </div>
@@ -365,7 +366,7 @@
 <div id="teknisyenModal" class="modal-overlay"><div class="modal-container"><h3>Teknisyen Yönetimi</h3><div style="display:flex; gap:8px; margin-bottom:1rem;"><input type="text" id="yeniTeknisyenAd" placeholder="Ad Soyad"><input type="text" id="yeniTeknisyenTel" placeholder="Telefon"><button id="teknisyenEkleBtn" class="btn-modal-save">Ekle</button></div><div id="teknisyenListesi"></div><button class="btn-modal-cancel" id="teknisyenModalKapat">Kapat</button></div></div>
 
 <script>
-    // Firebase yapılandırması
+    // Firebase yapılandırması (sizin bilgileriniz)
     const firebaseConfig = {
         apiKey: "AIzaSyBSHVgcvx64rFmySgSj3ATMEQ_XS1d1B04",
         authDomain: "arizatakiphecha.firebaseapp.com",
@@ -395,7 +396,6 @@
         completed: { column: null, direction: 'asc' }
     };
 
-    // Yardımcı fonksiyonlar
     function escapeHtml(str) { if (!str) return ""; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
     function getTeknisyenTel(ad) { let t = teknisyenler.find(tk => tk.ad === ad); return t ? t.tel : null; }
     function calculateWaitingDays(fault) {
@@ -415,10 +415,7 @@
         database.ref('faults').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                // Firebase'deki verileri diziye çevir, her birine id'yi ekle
-                faultsArray = Object.keys(data).map(key => {
-                    return { ...data[key], firebaseId: key };
-                });
+                faultsArray = Object.keys(data).map(key => ({ ...data[key], firebaseId: key }));
             } else {
                 faultsArray = [];
             }
@@ -433,9 +430,7 @@
         database.ref('teknisyenler').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                teknisyenler = Object.keys(data).map(key => {
-                    return { ...data[key], firebaseId: key };
-                });
+                teknisyenler = Object.keys(data).map(key => ({ ...data[key], firebaseId: key }));
             } else {
                 teknisyenler = [];
             }
@@ -471,13 +466,11 @@
             if (iletisim && existingFirma.iletisim !== iletisim) { existingFirma.iletisim = iletisim; guncellendi = true; }
             if (konum && existingFirma.konum !== konum) { existingFirma.konum = konum; guncellendi = true; }
             if (guncellendi) {
-                // Tüm arızalarda bu firmanın bilgilerini güncelle
                 faultsArray.forEach(f => {
                     if (f.firma === firmaAdi) {
                         if (sehir && f.sehir !== sehir) f.sehir = sehir;
                         if (iletisim && f.iletisim !== iletisim) f.iletisim = iletisim;
                         if (konum && f.konum !== konum) f.konum = konum;
-                        // Firebase'e güncelle
                         if (f.firebaseId) {
                             database.ref('faults/' + f.firebaseId).update({ sehir: f.sehir, iletisim: f.iletisim, konum: f.konum });
                         }
@@ -502,10 +495,6 @@
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    function saveAll() {
-        // Firebase'de otomatik senkronizasyon var, ayrıca bir şey yapmaya gerek yok
-    }
-    
     function updateFirmaDatalist() {
         let datalist = document.getElementById("firmaListesi");
         if (datalist) datalist.innerHTML = firmalar.map(f => `<option value="${escapeHtml(f.ad)}">`).join('');
@@ -518,67 +507,30 @@
 
     function filterAndSort(list) {
         let s = searchTerm.trim().toLowerCase();
-        let filtered = list.filter(item => 
+        return list.filter(item => 
             (item.firma || "").toLowerCase().includes(s) || 
             (item.sehir || "").toLowerCase().includes(s) || 
             (item.ariza || "").toLowerCase().includes(s) ||
             (item.teknisyen || "").toLowerCase().includes(s)
         );
-        return filtered;
     }
     
     function sortFaults(list, column, direction) {
         return [...list].sort((a, b) => {
             let valA, valB;
             switch(column) {
-                case 'tarih':
-                    valA = a.tarih || '';
-                    valB = b.tarih || '';
-                    break;
-                case 'bekleme':
-                    valA = calculateWaitingDays(a);
-                    valB = calculateWaitingDays(b);
-                    break;
-                case 'firma':
-                    valA = (a.firma || '').toLowerCase();
-                    valB = (b.firma || '').toLowerCase();
-                    break;
-                case 'sehir':
-                    valA = (a.sehir || '').toLowerCase();
-                    valB = (b.sehir || '').toLowerCase();
-                    break;
-                case 'iletisim':
-                    valA = (a.iletisim || '').toLowerCase();
-                    valB = (b.iletisim || '').toLowerCase();
-                    break;
-                case 'model':
-                    valA = (a.modelSeri || '').toLowerCase();
-                    valB = (b.modelSeri || '').toLowerCase();
-                    break;
-                case 'calismaSaati':
-                    valA = (a.calismaSaati || '');
-                    valB = (b.calismaSaati || '');
-                    break;
-                case 'ariza':
-                    valA = (a.ariza || '').toLowerCase();
-                    valB = (b.ariza || '').toLowerCase();
-                    break;
-                case 'mudahale':
-                    valA = (a.mudahale || '').toLowerCase();
-                    valB = (b.mudahale || '').toLowerCase();
-                    break;
-                case 'teknisyen':
-                    valA = (a.teknisyen || '').toLowerCase();
-                    valB = (b.teknisyen || '').toLowerCase();
-                    break;
-                case 'konum':
-                    valA = (a.konum || '').toLowerCase();
-                    valB = (b.konum || '').toLowerCase();
-                    break;
-                case 'bitis':
-                    valA = a.bitisTarihi || '';
-                    valB = b.bitisTarihi || '';
-                    break;
+                case 'tarih': valA = a.tarih || ''; valB = b.tarih || ''; break;
+                case 'bekleme': valA = calculateWaitingDays(a); valB = calculateWaitingDays(b); break;
+                case 'firma': valA = (a.firma || '').toLowerCase(); valB = (b.firma || '').toLowerCase(); break;
+                case 'sehir': valA = (a.sehir || '').toLowerCase(); valB = (b.sehir || '').toLowerCase(); break;
+                case 'iletisim': valA = (a.iletisim || '').toLowerCase(); valB = (b.iletisim || '').toLowerCase(); break;
+                case 'model': valA = (a.modelSeri || '').toLowerCase(); valB = (b.modelSeri || '').toLowerCase(); break;
+                case 'calismaSaati': valA = (a.calismaSaati || ''); valB = (b.calismaSaati || ''); break;
+                case 'ariza': valA = (a.ariza || '').toLowerCase(); valB = (b.ariza || '').toLowerCase(); break;
+                case 'mudahale': valA = (a.mudahale || '').toLowerCase(); valB = (b.mudahale || '').toLowerCase(); break;
+                case 'teknisyen': valA = (a.teknisyen || '').toLowerCase(); valB = (b.teknisyen || '').toLowerCase(); break;
+                case 'konum': valA = (a.konum || '').toLowerCase(); valB = (b.konum || '').toLowerCase(); break;
+                case 'bitis': valA = a.bitisTarihi || ''; valB = b.bitisTarihi || ''; break;
                 default: return 0;
             }
             if (valA < valB) return direction === 'asc' ? -1 : 1;
@@ -592,15 +544,9 @@
         let progressRaw = filterAndSort(faultsArray.filter(f => f.durum === "İşlemde"));
         let completedRaw = filterAndSort(faultsArray.filter(f => f.durum === "Tamamlandı"));
         
-        if (sortState.waiting.column) {
-            waitingRaw = sortFaults(waitingRaw, sortState.waiting.column, sortState.waiting.direction);
-        }
-        if (sortState.progress.column) {
-            progressRaw = sortFaults(progressRaw, sortState.progress.column, sortState.progress.direction);
-        }
-        if (sortState.completed.column) {
-            completedRaw = sortFaults(completedRaw, sortState.completed.column, sortState.completed.direction);
-        }
+        if (sortState.waiting.column) waitingRaw = sortFaults(waitingRaw, sortState.waiting.column, sortState.waiting.direction);
+        if (sortState.progress.column) progressRaw = sortFaults(progressRaw, sortState.progress.column, sortState.progress.direction);
+        if (sortState.completed.column) completedRaw = sortFaults(completedRaw, sortState.completed.column, sortState.completed.direction);
         
         document.getElementById("waitingCount").innerText = waitingRaw.length;
         document.getElementById("progressCount").innerText = progressRaw.length;
@@ -642,7 +588,6 @@
         renderBody(progressRaw, "progressBody", "progress");
         renderBody(completedRaw, "completedBody", "completed");
         attachTableEvents();
-        
         updateSortIcons('waitingTable', sortState.waiting);
         updateSortIcons('progressTable', sortState.progress);
         updateSortIcons('completedTable', sortState.completed);
@@ -652,45 +597,29 @@
         let table = document.getElementById(tableId);
         if (!table) return;
         let headers = table.querySelectorAll('th');
-        headers.forEach(th => {
-            let span = th.querySelector('.sort-icon');
-            if (span) span.innerHTML = '↕️';
-        });
+        headers.forEach(th => { let span = th.querySelector('.sort-icon'); if (span) span.innerHTML = '↕️'; });
         if (state.column) {
             let targetTh = null;
             for (let i=0; i<table.rows[0].cells.length; i++) {
-                let cell = table.rows[0].cells[i];
-                if (cell.getAttribute('data-sort') === state.column) {
-                    targetTh = cell;
-                    break;
-                }
+                if (table.rows[0].cells[i].getAttribute('data-sort') === state.column) { targetTh = table.rows[0].cells[i]; break; }
             }
-            if (targetTh) {
-                let span = targetTh.querySelector('.sort-icon');
-                if (span) span.innerHTML = state.direction === 'asc' ? '▲' : '▼';
-            }
+            if (targetTh) { let span = targetTh.querySelector('.sort-icon'); if (span) span.innerHTML = state.direction === 'asc' ? '▲' : '▼'; }
         }
     }
     
     function attachSortListeners() {
-        const tables = ['waitingTable', 'progressTable', 'completedTable'];
-        tables.forEach(tableId => {
+        ['waitingTable', 'progressTable', 'completedTable'].forEach(tableId => {
             let table = document.getElementById(tableId);
             if (!table) return;
-            let headers = table.querySelectorAll('th');
-            headers.forEach(th => {
+            Array.from(table.querySelectorAll('th')).forEach(th => {
                 let sortKey = th.getAttribute('data-sort');
                 if (!sortKey || sortKey === 'islem' || sortKey === 'whatsapp') return;
                 th.style.cursor = 'pointer';
                 th.removeEventListener('click', th._sortHandler);
-                let handler = (e) => {
+                let handler = () => {
                     let state = sortState[tableId === 'waitingTable' ? 'waiting' : (tableId === 'progressTable' ? 'progress' : 'completed')];
-                    if (state.column === sortKey) {
-                        state.direction = state.direction === 'asc' ? 'desc' : 'asc';
-                    } else {
-                        state.column = sortKey;
-                        state.direction = 'asc';
-                    }
+                    if (state.column === sortKey) state.direction = state.direction === 'asc' ? 'desc' : 'asc';
+                    else { state.column = sortKey; state.direction = 'asc'; }
                     renderTables();
                 };
                 th._sortHandler = handler;
@@ -704,9 +633,7 @@
         document.querySelectorAll('.action-btn.delete').forEach(btn => btn.addEventListener('click', () => {
             if (confirm("Silinsin mi?")) {
                 let firebaseId = btn.getAttribute('data-id');
-                database.ref('faults/' + firebaseId).remove().then(() => {
-                    // Silme başarılı, veriler otomatik güncellenecek
-                }).catch(err => alert("Silme hatası: " + err));
+                database.ref('faults/' + firebaseId).remove().catch(err => alert("Silme hatası: " + err));
             }
         }));
         document.querySelectorAll('.whatsapp-btn:not(.disabled)').forEach(btn => btn.addEventListener('click', () => {
@@ -773,15 +700,11 @@
         };
         
         if (currentEditId) {
-            // Güncelleme
-            database.ref('faults/' + currentEditId).update(newF).then(() => {
-                afterFaultSaved(firmaAdi, sehir, iletisim, konum);
-            }).catch(err => alert("Güncelleme hatası: " + err));
+            database.ref('faults/' + currentEditId).update(newF).then(() => afterFaultSaved(firmaAdi, sehir, iletisim, konum))
+                .catch(err => alert("Güncelleme hatası: " + err));
         } else {
-            // Yeni ekleme
-            database.ref('faults').push(newF).then(() => {
-                afterFaultSaved(firmaAdi, sehir, iletisim, konum);
-            }).catch(err => alert("Ekleme hatası: " + err));
+            database.ref('faults').push(newF).then(() => afterFaultSaved(firmaAdi, sehir, iletisim, konum))
+                .catch(err => alert("Ekleme hatası: " + err));
         }
         closeFaultModal();
     }
@@ -799,7 +722,7 @@
         allBtn.className = 'month-btn';
         allBtn.setAttribute('data-month', '');
         allBtn.innerText = '📅 Tümü';
-        allBtn.addEventListener('click', function() {
+        allBtn.addEventListener('click', () => {
             document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
             allBtn.classList.add('active');
             currentSelectedMonth = null;
@@ -821,7 +744,7 @@
             });
             container.appendChild(btn);
         });
-        if (allBtn) allBtn.classList.add('active');
+        allBtn.classList.add('active');
         currentSelectedMonth = null;
         renderMonthlyReport(null);
     }
@@ -859,7 +782,7 @@
         document.getElementById("monthStats").innerHTML = `<div class="stat-card"><div class="stat-number">${total}</div><div>Toplam Arıza</div></div><div class="stat-card"><div class="stat-number">${completedCount}</div><div>Tamamlanan</div></div><div class="stat-card"><div class="stat-number">${pending}</div><div>Bekleyen</div></div>`;
         let tableBody = document.getElementById("monthlyFaultsBody");
         if (filtered.length === 0) tableBody.innerHTML = '<tr><td colspan="6">Bu dönemde kayıt yok</td></tr>';
-        else tableBody.innerHTML = filtered.map(f => `<td><td>${escapeHtml(f.tarih)}</td><td><span class="status-badge ${f.durum === 'Bekliyor' ? 'waiting' : (f.durum === 'İşlemde' ? 'progress' : 'completed')}">${f.durum}</span></td><td>${escapeHtml(f.firma)}</td><td>${escapeHtml(f.sehir)}</td><td>${escapeHtml(f.ariza || '-')}</td><td>${escapeHtml(f.teknisyen || '-')}</td></tr>`).join('');
+        else tableBody.innerHTML = filtered.map(f => `<tr><td>${escapeHtml(f.tarih)}</td><td><span class="status-badge ${f.durum === 'Bekliyor' ? 'waiting' : (f.durum === 'İşlemde' ? 'progress' : 'completed')}">${f.durum}</span></td><td>${escapeHtml(f.firma)}</td><td>${escapeHtml(f.sehir)}</td><td>${escapeHtml(f.ariza || '-')}</td><td>${escapeHtml(f.teknisyen || '-')}</td></tr>`).join('');
         let dailyMap = new Map();
         filtered.forEach(f => { if (f.tarih) dailyMap.set(f.tarih, (dailyMap.get(f.tarih) || 0) + 1); });
         let sortedDates = Array.from(dailyMap.keys()).sort();
@@ -878,36 +801,13 @@
         if (!div) return;
         div.innerHTML = teknisyenler.map(t => `<div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>${escapeHtml(t.ad)} - ${t.tel}</span><button class="teknisyen-sil" data-id="${t.firebaseId}" style="background:red; color:white; border:none; border-radius:20px; padding:2px 10px;">Sil</button></div>`).join('');
         document.querySelectorAll('.teknisyen-sil').forEach(btn => btn.addEventListener('click', () => {
-            let id = btn.getAttribute('data-id');
-            database.ref('teknisyenler/' + id).remove();
+            database.ref('teknisyenler/' + btn.getAttribute('data-id')).remove();
         }));
-    }
-    
-    function saveTeknisyenlerToFirebase() {
-        // Teknisyenler zaten Firebase'den geliyor, ekleme/silme işlemleri doğrudan yapılıyor
     }
 
     // DOM yüklendiğinde
     document.addEventListener("DOMContentLoaded", () => {
-        // Firebase verilerini dinlemeye başla
         loadDataFromFirebase();
-        
-        // Teknisyenleri dinle
-        database.ref('teknisyenler').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                teknisyenler = Object.keys(data).map(key => {
-                    return { ...data[key], firebaseId: key };
-                });
-            } else {
-                teknisyenler = [];
-            }
-            updateTeknisyenDropdown();
-            renderTables();
-            renderTeknisyenList(); // Modal açıkken güncellenebilir
-        });
-        
-        updateTeknisyenDropdown();
         attachSortListeners();
         
         document.getElementById("newFaultBtn").addEventListener("click", newFault);
