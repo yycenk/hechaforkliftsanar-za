@@ -886,7 +886,30 @@
         }));
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
+    
+const USERS={"gülnaz":"2314","doğan":"0730"};
+function checkLogin(){
+ if(sessionStorage.getItem("hechaUser")){
+   document.getElementById("loginOverlay").style.display="none";
+   return true;
+ }
+ return false;
+}
+function doLogin(){
+ const user=document.getElementById("loginUser").value.trim().toLowerCase();
+ const pass=document.getElementById("loginPass").value.trim();
+ if(USERS[user]===pass){
+   sessionStorage.setItem("hechaUser",user);
+   document.getElementById("loginOverlay").style.display="none";
+ } else {
+   document.getElementById("loginError").innerText="Kullanıcı adı veya şifre hatalı";
+ }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("loginBtn").addEventListener("click", doLogin);
+        document.getElementById("loginPass").addEventListener("keypress", e=>{if(e.key==="Enter") doLogin();});
+        checkLogin();
         loadData(); updateTeknisyenDropdown(); renderTables(); attachSortListeners(); buildMonthSlicer();
         document.getElementById("newFaultBtn").addEventListener("click", newFault);
         document.getElementById("modalCancelBtn").addEventListener("click", closeFaultModal);
@@ -934,5 +957,15 @@
         });
     });
 </script>
+
+<div id="loginOverlay" style="position:fixed;inset:0;background:#f4f7fb;display:flex;justify-content:center;align-items:center;z-index:999999">
+<div style="background:#fff;padding:35px;border-radius:20px;width:350px;box-shadow:0 10px 30px rgba(0,0,0,.15)">
+<h2 style="text-align:center;margin-bottom:20px">HECHA Giriş</h2>
+<input id="loginUser" placeholder="Kullanıcı Adı" style="width:100%;padding:12px;margin-bottom:10px">
+<input id="loginPass" type="password" placeholder="Şifre" style="width:100%;padding:12px;margin-bottom:10px">
+<button id="loginBtn" style="width:100%;padding:12px">Giriş Yap</button>
+<div id="loginError" style="color:red;margin-top:10px;text-align:center"></div>
+</div></div>
+
 </body>
 </html>
