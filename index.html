@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HECHA | FORKLİFTSAN Arıza Takip </title>
+    <title>HECHA | FORKLİFTSAN Arıza Takip</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- Firebase SDK'ları -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
@@ -58,7 +57,7 @@
             outline: none;
             background: transparent;
         }
-        .btn-icon, .btn-new {
+        .btn-icon, .btn-new, .btn-reset, .btn-logout {
             padding: 0.5rem 1.2rem;
             border-radius: 60px;
             font-weight: 600;
@@ -74,6 +73,14 @@
         }
         .btn-new {
             background: linear-gradient(95deg, #1E3A5F, #2A5F7A);
+            color: white;
+        }
+        .btn-reset {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-logout {
+            background: #6c757d;
             color: white;
         }
         .tab-bar {
@@ -304,54 +311,138 @@
             pointer-events: none;
         }
         .toast-notify.show { opacity: 1; }
+        
+        /* LOGIN SCREEN */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1E3A5F, #2A5F7A);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: 0.3s;
+        }
+        .login-container {
+            background: white;
+            border-radius: 32px;
+            padding: 2rem;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+        }
+        .login-container h2 {
+            margin-bottom: 1.5rem;
+            color: #1e4663;
+        }
+        .login-input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border-radius: 60px;
+            border: 1px solid #cfdfed;
+            font-family: inherit;
+        }
+        .login-btn {
+            width: 100%;
+            background: #1E3A5F;
+            color: white;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 60px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .error-msg {
+            color: #dc3545;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+        .app-content {
+            display: none;
+        }
+        .app-content.visible {
+            display: block;
+        }
+        .user-welcome {
+            background: white;
+            border-radius: 40px;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <div class="title-section"><h1>⚙️ HECHA & FORKLİFTSAN ARIZA TAKİP </h1></div>
-        <div class="header-actions">
-            <div class="search-area"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Firma, şehir, arıza..."></div>
-            <button class="btn-icon" id="teknisyenBtn"><i class="fas fa-users"></i> Teknisyenler</button>
-            <button class="btn-new" id="newFaultBtn"><i class="fas fa-plus-circle"></i> Yeni Arıza</button>
+
+<!-- GİRİŞ EKRANI -->
+<div id="loginScreen" class="login-overlay">
+    <div class="login-container">
+        <h2>🔐 Giriş Yap</h2>
+        <input type="text" id="loginUsername" class="login-input" placeholder="Kullanıcı Adı" autocomplete="off">
+        <input type="password" id="loginPassword" class="login-input" placeholder="Şifre">
+        <button id="loginBtn" class="login-btn">Giriş</button>
+        <div id="loginError" class="error-msg"></div>
+    </div>
+</div>
+
+<!-- ANA UYGULAMA İÇERİĞİ -->
+<div id="appContent" class="app-content">
+    <div class="container">
+        <div class="header">
+            <div class="title-section"><h1>⚙️ HECHA & FORKLİFTSAN ARIZA TAKİP</h1></div>
+            <div class="header-actions">
+                <div class="user-welcome" id="userWelcome"></div>
+                <div class="search-area"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Firma, şehir, arıza..."></div>
+                <button class="btn-icon" id="teknisyenBtn"><i class="fas fa-users"></i> Teknisyenler</button>
+                <button class="btn-reset" id="resetDatabaseBtn"><i class="fas fa-trash-alt"></i> Veritabanını Sıfırla</button>
+                <button class="btn-new" id="newFaultBtn"><i class="fas fa-plus-circle"></i> Yeni Arıza</button>
+                <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</button>
+            </div>
         </div>
-    </div>
 
-    <div class="tab-bar">
-        <button class="tab-btn active" data-tab="arizaTab">📋 Arızalar</button>
-        <button class="tab-btn" data-tab="raporTab">📊 Aylık Raporlar</button>
-    </div>
+        <div class="tab-bar">
+            <button class="tab-btn active" data-tab="arizaTab">📋 Arızalar</button>
+            <button class="tab-btn" data-tab="raporTab">📊 Aylık Raporlar</button>
+        </div>
 
-    <!-- Arızalar Sekmesi -->
-    <div id="arizaTab" class="tab-content active">
-        <div class="fault-section"><div class="section-header"><h2><i class="fas fa-clock"></i> BEKLEYEN ARIZALAR <span class="badge-count" id="waitingCount">0</span></h2></div>
-            <div class="table-wrapper"><table class="data-table" id="waitingTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="waitingBody"></tbody></table></div></div>
-        <div class="fault-section"><div class="section-header"><h2><i class="fas fa-gear"></i> İŞLEMDEKİ ARIZALAR <span class="badge-count" id="progressCount">0</span></h2></div>
-            <div class="table-wrapper"><table class="data-table" id="progressTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></table></thead><tbody id="progressBody"></tbody></table></div></div>
-        <div class="fault-section"><div class="section-header"><h2><i class="fas fa-check-circle"></i> TAMAMLANAN ARIZALAR <span class="badge-count" id="completedCount">0</span></h2></div>
-            <div class="table-wrapper"><table class="data-table" id="completedTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="completedBody"></tbody></table></div></div>
-    </div>
+        <!-- Arızalar Sekmesi -->
+        <div id="arizaTab" class="tab-content active">
+            <div class="fault-section"><div class="section-header"><h2><i class="fas fa-clock"></i> BEKLEYEN ARIZALAR <span class="badge-count" id="waitingCount">0</span></h2></div>
+                <div class="table-wrapper"><table class="data-table" id="waitingTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="waitingBody"></tbody></table></div></div>
+            <div class="fault-section"><div class="section-header"><h2><i class="fas fa-gear"></i> İŞLEMDEKİ ARIZALAR <span class="badge-count" id="progressCount">0</span></h2></div>
+                <div class="table-wrapper"><table class="data-table" id="progressTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="progressBody"></tbody></table></div></div>
+            <div class="fault-section"><div class="section-header"><h2><i class="fas fa-check-circle"></i> TAMAMLANAN ARIZALAR <span class="badge-count" id="completedCount">0</span></h2></div>
+                <div class="table-wrapper"><table class="data-table" id="completedTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="completedBody"></tbody></table></div></div>
+        </div>
 
-    <!-- Raporlar Sekmesi -->
-    <div id="raporTab" class="tab-content">
-        <div style="background: white; border-radius: 28px; padding: 1.5rem;">
-            <h2 style="margin-bottom: 1rem;">📅 AYLIK ARIZA RAPORLARI</h2>
-            <div class="month-slicer" id="monthSlicer"></div>
-            <div id="monthlyReportPanel">
-                <div class="report-month-title" id="selectedMonthTitle">Bir ay seçin</div>
-                <div class="monthly-stats" id="monthStats"></div>
-                <div class="inline-chart"><canvas id="dailyLineChart" width="800" height="250"></canvas></div>
-                <div class="report-table-wrapper"><table class="data-table" id="monthlyFaultsTable"><thead><tr><th>TARİH</th><th>DURUM</th><th>FİRMA</th><th>ŞEHİR</th><th>ARIZA</th><th>TEKNİSYEN</th></tr></thead><tbody id="monthlyFaultsBody"></tbody></table></div>
-                <div id="firmReportContainer" style="display: none;">
-                    <h3 style="margin: 20px 0 10px 0;">🏢 Firma Bazlı Arıza Dağılımı (Tüm Zamanlar)</h3>
-                    <div class="firm-stats-grid">
-                        <div class="firm-stats-table-wrapper">
-                            <table class="data-table" id="firmStatsTable">
-                                <thead><tr><th>Firma</th><th>Toplam Arıza</th><th>Tamamlanan</th><th>Bekleyen</th></tr></thead>
-                                <tbody id="firmStatsBody"></tbody>
-                            </table>
+        <!-- Raporlar Sekmesi -->
+        <div id="raporTab" class="tab-content">
+            <div style="background: white; border-radius: 28px; padding: 1.5rem;">
+                <h2 style="margin-bottom: 1rem;">📅 AYLIK ARIZA RAPORLARI</h2>
+                <div class="month-slicer" id="monthSlicer"></div>
+                <div id="monthlyReportPanel">
+                    <div class="report-month-title" id="selectedMonthTitle">Bir ay seçin</div>
+                    <div class="monthly-stats" id="monthStats"></div>
+                    <div class="inline-chart"><canvas id="dailyLineChart" width="800" height="250"></canvas></div>
+                    <div class="report-table-wrapper"><table class="data-table" id="monthlyFaultsTable"><thead><tr><th>TARİH</th><th>DURUM</th><th>FİRMA</th><th>ŞEHİR</th><th>ARIZA</th><th>TEKNİSYEN</th></tr></thead><tbody id="monthlyFaultsBody"></tbody></table></div>
+                    <div id="firmReportContainer" style="display: none;">
+                        <h3 style="margin: 20px 0 10px 0;">🏢 Firma Bazlı Arıza Dağılımı (Tüm Zamanlar)</h3>
+                        <div class="firm-stats-grid">
+                            <div class="firm-stats-table-wrapper">
+                                <table class="data-table" id="firmStatsTable">
+                                    <thead><tr><th>Firma</th><th>Toplam Arıza</th><th>Tamamlanan</th><th>Bekleyen</th></tr></thead>
+                                    <tbody id="firmStatsBody"></tbody>
+                                </table>
+                            </div>
+                            <div class="inline-chart"><canvas id="firmBarChart" width="400" height="250"></canvas></div>
                         </div>
-                        <div class="inline-chart"><canvas id="firmBarChart" width="400" height="250"></canvas></div>
                     </div>
                 </div>
             </div>
@@ -378,10 +469,10 @@
 
 <!-- Teknisyen Modal -->
 <div id="teknisyenModal" class="modal-overlay"><div class="modal-container"><h3>Teknisyen Yönetimi</h3><div style="display:flex; gap:8px; margin-bottom:1rem;"><input type="text" id="yeniTeknisyenAd" placeholder="Ad Soyad"><input type="text" id="yeniTeknisyenTel" placeholder="Telefon"><button id="teknisyenEkleBtn" class="btn-modal-save">Ekle</button></div><div id="teknisyenListesi"></div><button class="btn-modal-cancel" id="teknisyenModalKapat">Kapat</button></div></div>
-<div id="toast" class="toast-notify">✅ Eski kayıtlar Firebase'e aktarıldı</div>
+<div id="toast" class="toast-notify">✅ İşlem tamamlandı</div>
 
 <script>
-    // ---------- Firebase yapılandırması (sizin mevcut yapılandırmanız) ----------
+    // ---------- Firebase yapılandırması ----------
     const firebaseConfig = {
         apiKey: "AIzaSyBSHVgcvx64rFmySgSj3ATMEQ_XS1d1B04",
         authDomain: "arizatakiphecha.firebaseapp.com",
@@ -394,44 +485,52 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // ---------- ESKI SİSTEMDEN AKTARILAN VERİLER (29 KAYIT + TEKNİSYENLER) ----------
+    // ---------- KULLANICI BİLGİLERİ ----------
+    const validUsers = {
+        "admin": "2314",
+        "gülnaz": "0000",
+        "doğan": "0730"
+    };
+    let currentUser = null;
+
+    // ---------- TÜM ESKI KAYITLAR (29 adet) ----------
     const DEFAULT_FAULTS = [
-        { id: "ex1", durum: "Bekliyor", tarih: "2026-05-16", firma: "ISILSAN HENDEK", sehir: "SAKARYA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "YAĞ KAÇAĞI-", mudahale: "ATİLLA GİTTİ -", teknisyen: "Atilla", konum: "Hendek", formNo: "11,050 TL GR", bitisTarihi: "" },
-        { id: "ex2", durum: "Bekliyor", tarih: "2026-05-16", firma: "HYZ", sehir: "SAKARYA", iletisim: "DİZEL MAKİNA", modelSeri: "5387627360", calismaSaati: "", ariza: "KOLTUK SWİTCH", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex3", durum: "Bekliyor", tarih: "2026-05-16", firma: "NZN OTOMOTİV", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "FRENLER TUTMUYOR - YAZILIM MI - MEKANİK Mİ BAKILACAK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex4", durum: "Bekliyor", tarih: "2026-05-16", firma: "TAHA AMBALAJ", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "REACTRUCK TEKER - YALE YAĞ KAÇAĞI", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex5", durum: "Bekliyor", tarih: "2026-05-16", firma: "ŞAHİNLER KABLO - AĞ KABLO", sehir: "TUZLA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "KAPI KAPANMIYOR. - makara kafası e koruma kapağı", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex6", durum: "Bekliyor", tarih: "2026-05-16", firma: "BARIŞLAR MERMER", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "1000 SAATTE BAKIM İSTİYOR.", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex7", durum: "Bekliyor", tarih: "2026-05-15", firma: "ŞAHİNLER METAL ALT BÖLME AĞ KABLO", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "SİLGİ KOLU - SİLGİ SÜPÜRGESİ", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex8", durum: "Bekliyor", tarih: "2026-05-15", firma: "ÖZ BEREKET", sehir: "ARNAVUT KÖY", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "MAKİNA KENDİ KENDİNE HIZ KESİYOR. KENDİ KENDİNE FRENLEME YAPIYOR", mudahale: "4-11-2025 DAGAZ PEDALI DEĞİŞMİŞ - 03-3-2026 YAZILIM ATILMIŞ", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex9", durum: "Bekliyor", tarih: "2026-05-14", firma: "ŞAHİNLER METAL", sehir: "", iletisim: "M.ALİ", modelSeri: "", calismaSaati: "", ariza: "KALDIRMA KOLU TAKILI KALIYOR", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex10", durum: "Bekliyor", tarih: "2026-05-14", firma: "TURSAM GALV.", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "KABİN SU ALIYOR ÖN CAM AYAKLARI PROBLEMLİ", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex11", durum: "Bekliyor", tarih: "2026-05-14", firma: "ERVAN DOĞALTAŞ", sehir: "PAMUKKALE", iletisim: "2026-05-21", modelSeri: "", calismaSaati: "", ariza: "ÖN LASTİK - 1 1000 SAAT 2 2000 SAAT + DİREKSİYON MAFSALI", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex12", durum: "Bekliyor", tarih: "2026-05-14", firma: "ADAKAYA PANEL", sehir: "SAKARYA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "HYD-TRD 28 - DEFRANSİYEL YARIM AY ŞEKLİNDE KEP GEÇSEDE İŞLEM YAPILACAK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex13", durum: "Bekliyor", tarih: "2026-05-04", firma: "İBRAHİM YILDIRIM", sehir: "ŞANLI URFA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "GAZ YEMİYOR - BAKIM TEKLİFİ İLETİLDİ.", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex14", durum: "Bekliyor", tarih: "2026-05-03", firma: "biotem - TUSAŞ", sehir: "ANKARA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "KOLTUK SWİTCH - KIYAFET- SİGARA", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex15", durum: "Bekliyor", tarih: "2026-04-30", firma: "BAYSAL SEBZE", sehir: "ANTALYA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "MAKİNA YÜRÜMÜYOR", mudahale: "DİZELİNDE ENJEKTÖR DEĞİŞİMİ GARANTİ KAPSAMINDA OLACAK", teknisyen: "AKİF MAKİNA", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex16", durum: "Bekliyor", tarih: "2026-04-26", firma: "EKOBORD", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "KABİN AYAĞI VE MAKARA KORUMASI - ŞANZIMAN SIN GELİYOR - AKÜDE KOKU VAR", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex17", durum: "Bekliyor", tarih: "2026-04-26", firma: "YAMAS", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "SAF SU GİDECEK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex18", durum: "Bekliyor", tarih: "2026-04-17", firma: "ARG ORMAN ÜRÜNLERİ", sehir: "MUĞLA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "500 SAAT BAKIM", mudahale: "TEKLİF GÖNDERİLDİ", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex19", durum: "Bekliyor", tarih: "2026-03-10", firma: "KALİSAN", sehir: "İZMİR", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "BAKIM - MUSTAFA URYA TARAFINDAN YAPILDI", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex20", durum: "Bekliyor", tarih: "2026-03-05", firma: "EFTA TUZ", sehir: "ANKARA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "BAKIM", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex21", durum: "Bekliyor", tarih: "2026-02-20", firma: "KONTEN SAN", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "ÖN LASTİK - 1 ADET LASTİK KÖTÜ DURUMDA BEDELSİZ DEĞİŞECEK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex22", durum: "Bekliyor", tarih: "2026-02-14", firma: "DAKDUKLU", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "ÖN CAM TEKLİFİ", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex23", durum: "Bekliyor", tarih: "2026-01-28", firma: "TEK KALE", sehir: "ÇEKMEKÖY İST", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "BAKIM 500 SAAT", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex24", durum: "Bekliyor", tarih: "2026-01-15", firma: "RÜZGAR FORKLİFT", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "3 ADET LEVYE SWİTCH GİDECEK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex25", durum: "Bekliyor", tarih: "2025-12-10", firma: "BAYSAL SEBZE", sehir: "ANTALYA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "EKRAN TAKILI KALMIŞ", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex26", durum: "Bekliyor", tarih: "2025-11-05", firma: "DÖV- HAS BLUE SPOT", sehir: "İSTANBUL", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "2 ADET BLUE SPOT 2500 + KDV", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex27", durum: "Bekliyor", tarih: "2025-10-12", firma: "zno kimya", sehir: "NİĞDE", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "bakım 1700 saatte", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex28", durum: "Tamamlandı", tarih: "2024-03-03", firma: "SPS ETİKET", sehir: "İSTANBUL - ARNAVUTKÖY", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "AKÜ 0 GÖSTERİYOR - HYD TRA ***", mudahale: "PROBLEM ÇÖZÜLDÜ", teknisyen: "UMUT - EROL", konum: "", formNo: "", bitisTarihi: "2024-03-10" },
-        { id: "ex29", durum: "İşlemde", tarih: "2026-05-28", firma: "DEMİR ÇELİK", sehir: "KOCAELİ", iletisim: "05321112233", modelSeri: "FD45T", calismaSaati: "2450", ariza: "Hidrolik pompa sesli", mudahale: "Parça siparişi", teknisyen: "Serkan K.", konum: "Kocaeli OSB", formNo: "F-342", bitisTarihi: "" }
+        { durum: "Bekliyor", tarih: "2026-05-16", firma: "ISILSAN HENDEK", sehir: "SAKARYA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "YAĞ KAÇAĞI-", mudahale: "ATİLLA GİTTİ -", teknisyen: "Atilla", konum: "Hendek", formNo: "11,050 TL GR", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-05-16", firma: "HYZ", sehir: "SAKARYA", iletisim: "DİZEL MAKİNA", modelSeri: "5387627360", calismaSaati: "", ariza: "KOLTUK SWİTCH", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-05-16", firma: "NZN OTOMOTİV", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "FRENLER TUTMUYOR - YAZILIM MI - MEKANİK Mİ BAKILACAK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-05-16", firma: "TAHA AMBALAJ", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "REACTRUCK TEKER - YALE YAĞ KAÇAĞI", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-05-16", firma: "ŞAHİNLER KABLO - AĞ KABLO", sehir: "TUZLA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "KAPI KAPANMIYOR. - makara kafası e koruma kapağı", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-05-16", firma: "BARIŞLAR MERMER", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "1000 SAATTE BAKIM İSTİYOR.", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-05-15", firma: "ŞAHİNLER METAL ALT BÖLME AĞ KABLO", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "SİLGİ KOLU - SİLGİ SÜPÜRGESİ", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-05-15", firma: "ÖZ BEREKET", sehir: "ARNAVUT KÖY", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "MAKİNA KENDİ KENDİNE HIZ KESİYOR. KENDİ KENDİNE FRENLEME YAPIYOR", mudahale: "4-11-2025 DAGAZ PEDALI DEĞİŞMİŞ - 03-3-2026 YAZILIM ATILMIŞ", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-05-14", firma: "ŞAHİNLER METAL", sehir: "", iletisim: "M.ALİ", modelSeri: "", calismaSaati: "", ariza: "KALDIRMA KOLU TAKILI KALIYOR", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-05-14", firma: "TURSAM GALV.", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "KABİN SU ALIYOR ÖN CAM AYAKLARI PROBLEMLİ", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-05-14", firma: "ERVAN DOĞALTAŞ", sehir: "PAMUKKALE", iletisim: "2026-05-21", modelSeri: "", calismaSaati: "", ariza: "ÖN LASTİK - 1 1000 SAAT 2 2000 SAAT + DİREKSİYON MAFSALI", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-05-14", firma: "ADAKAYA PANEL", sehir: "SAKARYA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "HYD-TRD 28 - DEFRANSİYEL YARIM AY ŞEKLİNDE KEP GEÇSEDE İŞLEM YAPILACAK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-05-04", firma: "İBRAHİM YILDIRIM", sehir: "ŞANLI URFA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "GAZ YEMİYOR - BAKIM TEKLİFİ İLETİLDİ.", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-05-03", firma: "biotem - TUSAŞ", sehir: "ANKARA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "KOLTUK SWİTCH - KIYAFET- SİGARA", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-04-30", firma: "BAYSAL SEBZE", sehir: "ANTALYA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "MAKİNA YÜRÜMÜYOR", mudahale: "DİZELİNDE ENJEKTÖR DEĞİŞİMİ GARANTİ KAPSAMINDA OLACAK", teknisyen: "AKİF MAKİNA", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-04-26", firma: "EKOBORD", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "KABİN AYAĞI VE MAKARA KORUMASI - ŞANZIMAN SIN GELİYOR - AKÜDE KOKU VAR", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-04-26", firma: "YAMAS", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "SAF SU GİDECEK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-04-17", firma: "ARG ORMAN ÜRÜNLERİ", sehir: "MUĞLA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "500 SAAT BAKIM", mudahale: "TEKLİF GÖNDERİLDİ", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-03-10", firma: "KALİSAN", sehir: "İZMİR", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "BAKIM - MUSTAFA URYA TARAFINDAN YAPILDI", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-03-05", firma: "EFTA TUZ", sehir: "ANKARA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "BAKIM", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-02-20", firma: "KONTEN SAN", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "ÖN LASTİK - 1 ADET LASTİK KÖTÜ DURUMDA BEDELSİZ DEĞİŞECEK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-02-14", firma: "DAKDUKLU", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "ÖN CAM TEKLİFİ", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-01-28", firma: "TEK KALE", sehir: "ÇEKMEKÖY İST", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "BAKIM 500 SAAT", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2026-01-15", firma: "RÜZGAR FORKLİFT", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "3 ADET LEVYE SWİTCH GİDECEK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2025-12-10", firma: "BAYSAL SEBZE", sehir: "ANTALYA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "EKRAN TAKILI KALMIŞ", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2025-11-05", firma: "DÖV- HAS BLUE SPOT", sehir: "İSTANBUL", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "2 ADET BLUE SPOT 2500 + KDV", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Bekliyor", tarih: "2025-10-12", firma: "zno kimya", sehir: "NİĞDE", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "bakım 1700 saatte", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { durum: "Tamamlandı", tarih: "2024-03-03", firma: "SPS ETİKET", sehir: "İSTANBUL - ARNAVUTKÖY", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "AKÜ 0 GÖSTERİYOR - HYD TRA ***", mudahale: "PROBLEM ÇÖZÜLDÜ", teknisyen: "UMUT - EROL", konum: "", formNo: "", bitisTarihi: "2024-03-10" },
+        { durum: "İşlemde", tarih: "2026-05-28", firma: "DEMİR ÇELİK", sehir: "KOCAELİ", iletisim: "05321112233", modelSeri: "FD45T", calismaSaati: "2450", ariza: "Hidrolik pompa sesli", mudahale: "Parça siparişi", teknisyen: "Serkan K.", konum: "Kocaeli OSB", formNo: "F-342", bitisTarihi: "" }
     ];
     
     const DEFAULT_TEKNISYENLER = [
-        { id: "t1", ad: "Atilla", tel: "905551112233" },
-        { id: "t2", ad: "Serkan K.", tel: "905322223344" },
-        { id: "t3", ad: "Umut", tel: "905334445566" },
-        { id: "t4", ad: "Akif", tel: "905441234567" }
+        { ad: "Atilla", tel: "905551112233" },
+        { ad: "Serkan K.", tel: "905322223344" },
+        { ad: "Umut", tel: "905334445566" },
+        { ad: "Akif", tel: "905441234567" }
     ];
 
     // ---------- UYGULAMA DEĞİŞKENLERİ ----------
@@ -781,10 +880,38 @@
         document.querySelectorAll('.teknisyen-sil').forEach(btn => btn.addEventListener('click', () => database.ref('teknisyenler/' + btn.getAttribute('data-id')).remove()));
     }
 
-    // ---------- FIREBASE VERİ AKIŞI ve ESKİ VERİLERİ AKTARMA ----------
-    let initialDataLoaded = false;
+    // ---------- VERİTABANINI SIFIRLAMA (ESKİ KAYITLARI GERİ YÜKLEME) ----------
+    async function resetDatabase() {
+        if (!confirm("TÜM VERİLER SİLİNECEK ve 29 arıza kaydı ile varsayılan teknisyenler YENİDEN EKLENECEK. Onaylıyor musunuz?")) return;
+        try {
+            const faultsSnapshot = await database.ref('faults').once('value');
+            const faultsData = faultsSnapshot.val();
+            if (faultsData) {
+                const removes = Object.keys(faultsData).map(key => database.ref('faults/' + key).remove());
+                await Promise.all(removes);
+            }
+            const tekSnapshot = await database.ref('teknisyenler').once('value');
+            const tekData = tekSnapshot.val();
+            if (tekData) {
+                const tekRemoves = Object.keys(tekData).map(key => database.ref('teknisyenler/' + key).remove());
+                await Promise.all(tekRemoves);
+            }
+            const faultPromises = DEFAULT_FAULTS.map(fault => database.ref('faults').push(fault));
+            await Promise.all(faultPromises);
+            const tekPromises = DEFAULT_TEKNISYENLER.map(tek => database.ref('teknisyenler').push(tek));
+            await Promise.all(tekPromises);
+            
+            const toast = document.getElementById('toast');
+            toast.innerText = '✅ Veritabanı sıfırlandı, 29 kayıt ve teknisyenler eklendi.';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        } catch (err) {
+            alert("Sıfırlama hatası: " + err.message);
+        }
+    }
+
+    // ---------- FIREBASE VERİ AKIŞI (OTOMATİK) ----------
     function loadDataFromFirebase() {
-        // Arızaları dinle
         database.ref('faults').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -796,25 +923,8 @@
             renderTables();
             buildMonthSlicer();
             if (document.getElementById("raporTab").classList.contains("active")) renderMonthlyReport(currentSelectedMonth);
-            
-            // Eğer hiç veri yoksa ve daha önce aktarma yapılmadıysa DEFAULT_FAULTS'u yükle
-            if (!initialDataLoaded && (!data || Object.keys(data).length === 0)) {
-                initialDataLoaded = true;
-                // Eski arıza kayıtlarını Firebase'e ekle
-                const promises = DEFAULT_FAULTS.map(fault => {
-                    const { id, ...cleanFault } = fault;  // id'yi kaldır, firebase otomatik üretsin
-                    return database.ref('faults').push(cleanFault);
-                });
-                Promise.all(promises).then(() => {
-                    console.log("29 adet eski arıza kaydı Firebase'e aktarıldı");
-                    const toast = document.getElementById('toast');
-                    toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), 3000);
-                }).catch(err => console.error("Aktarma hatası:", err));
-            }
         });
         
-        // Teknisyenleri dinle
         database.ref('teknisyenler').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -824,28 +934,67 @@
             }
             updateTeknisyenDropdown();
             renderTables();
-            
-            // Eğer teknisyen verisi yoksa varsayılanları ekle
-            if (!data || Object.keys(data).length === 0) {
-                const tekPromises = DEFAULT_TEKNISYENLER.map(t => {
-                    const { id, ...cleanT } = t;
-                    return database.ref('teknisyenler').push(cleanT);
-                });
-                Promise.all(tekPromises).then(() => console.log("Varsayılan teknisyenler eklendi"));
-            }
         });
+    }
+
+    // ---------- GİRİŞ KONTROLÜ ----------
+    function initAuth() {
+        const savedUser = sessionStorage.getItem('currentUser');
+        if (savedUser && validUsers[savedUser]) {
+            currentUser = savedUser;
+            showApp();
+        } else {
+            showLogin();
+        }
+    }
+
+    function showLogin() {
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('appContent').classList.remove('visible');
+    }
+
+    function showApp() {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('appContent').classList.add('visible');
+        document.getElementById('userWelcome').innerHTML = `<i class="fas fa-user-circle"></i> Hoşgeldin, ${currentUser}`;
+        // Firebase verilerini yükle (ilk kez geliyorsa)
+        if (faultsArray.length === 0) loadDataFromFirebase();
+    }
+
+    function logout() {
+        sessionStorage.removeItem('currentUser');
+        currentUser = null;
+        showLogin();
+    }
+
+    function handleLogin() {
+        const username = document.getElementById('loginUsername').value.trim().toLowerCase();
+        const password = document.getElementById('loginPassword').value;
+        const errorDiv = document.getElementById('loginError');
+        if (validUsers[username] && validUsers[username] === password) {
+            currentUser = username;
+            sessionStorage.setItem('currentUser', username);
+            showApp();
+        } else {
+            errorDiv.innerText = 'Hatalı kullanıcı adı veya şifre!';
+        }
     }
 
     // ---------- DOM OLAY BAĞLAMALARI ----------
     document.addEventListener("DOMContentLoaded", () => {
-        loadDataFromFirebase();
-        attachSortListeners();
-        document.getElementById("newFaultBtn").addEventListener("click", newFault);
-        document.getElementById("modalCancelBtn").addEventListener("click", closeFaultModal);
-        document.getElementById("faultForm").addEventListener("submit", saveFault);
-        document.getElementById("teknisyenBtn").addEventListener("click", openTeknisyenModal);
-        document.getElementById("teknisyenModalKapat").addEventListener("click", () => document.getElementById("teknisyenModal").classList.remove("active"));
-        document.getElementById("teknisyenEkleBtn").addEventListener("click", () => {
+        initAuth();
+        
+        document.getElementById("loginBtn").addEventListener("click", handleLogin);
+        document.getElementById("loginPassword").addEventListener("keypress", (e) => { if (e.key === 'Enter') handleLogin(); });
+        document.getElementById("logoutBtn").addEventListener("click", logout);
+        
+        // Diğer butonlar sadece uygulama görünürken çalışır (event delegation veya kontrol)
+        document.getElementById("newFaultBtn")?.addEventListener("click", newFault);
+        document.getElementById("modalCancelBtn")?.addEventListener("click", closeFaultModal);
+        document.getElementById("faultForm")?.addEventListener("submit", saveFault);
+        document.getElementById("teknisyenBtn")?.addEventListener("click", openTeknisyenModal);
+        document.getElementById("teknisyenModalKapat")?.addEventListener("click", () => document.getElementById("teknisyenModal").classList.remove("active"));
+        document.getElementById("teknisyenEkleBtn")?.addEventListener("click", () => {
             let ad = document.getElementById("yeniTeknisyenAd").value.trim();
             let tel = document.getElementById("yeniTeknisyenTel").value.trim();
             if (!ad || !tel) { alert("Ad ve telefon girin"); return; }
@@ -856,7 +1005,9 @@
                 document.getElementById("yeniTeknisyenTel").value = "";
             }).catch(err => alert("Ekleme hatası: " + err));
         });
-        document.getElementById("searchInput").addEventListener("input", (e) => { searchTerm = e.target.value; renderTables(); });
+        document.getElementById("resetDatabaseBtn")?.addEventListener("click", resetDatabase);
+        document.getElementById("searchInput")?.addEventListener("input", (e) => { searchTerm = e.target.value; renderTables(); });
+        
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -880,7 +1031,7 @@
                 }
             });
         }
-        document.getElementById("modalDurum").addEventListener("change", function() {
+        document.getElementById("modalDurum")?.addEventListener("change", function() {
             if (this.value === "Tamamlandı" && !document.getElementById("modalBitisTarihi").value)
                 document.getElementById("modalBitisTarihi").value = new Date().toISOString().slice(0,10);
             else if (this.value !== "Tamamlandı") document.getElementById("modalBitisTarihi").value = "";
