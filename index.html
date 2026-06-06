@@ -290,7 +290,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
  apiKey: "AIzaSyBSHVgcvx64rFmySgSj3ATMEQ_XS1d1B04",
@@ -312,11 +312,6 @@ window.cloudDB = {
  },
  async save(data){
    await setDoc(doc(db,"system","main"), data, {merge:true});
- },
- startLiveSync(onUpdate){
-   return onSnapshot(doc(db,"system","main"), (snap) => {
-     if(snap.exists()) onUpdate(snap.data());
-   });
  }
 };
 </script>
@@ -338,6 +333,7 @@ window.cloudDB = {
         <button class="tab-btn" data-tab="raporTab">📊 Aylık Raporlar</button>
     </div>
 
+    <!-- Arızalar Sekmesi - Tablo başlıkları sıralama için id'ler eklendi -->
     <div id="arizaTab" class="tab-content active">
         <div class="fault-section"><div class="section-header"><h2><i class="fas fa-clock"></i> BEKLEYEN ARIZALAR <span class="badge-count" id="waitingCount">0</span></h2></div>
             <div class="table-wrapper"><table class="data-table" id="waitingTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="waitingBody"></tbody></table></div></div>
@@ -347,6 +343,7 @@ window.cloudDB = {
             <div class="table-wrapper"><table class="data-table" id="completedTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="completedBody"></tbody></table></div></div>
     </div>
 
+    <!-- Raporlar Sekmesi (değişmedi) -->
     <div id="raporTab" class="tab-content">
         <div style="background: white; border-radius: 28px; padding: 1.5rem;">
             <h2 style="margin-bottom: 1rem;">📅 AYLIK ARIZA RAPORLARI</h2>
@@ -373,6 +370,7 @@ window.cloudDB = {
     </div>
 </div>
 
+<!-- Arıza Modal (değişmedi) -->
 <div id="faultModal" class="modal-overlay"><div class="modal-container"><h3 id="modalTitle">Arıza Kaydı</h3><form id="faultForm"><div class="form-grid">
     <div class="field-group"><label>DURUM</label><select id="modalDurum"><option value="Bekliyor">BEKLİYOR</option><option value="İşlemde">İŞLEMDE</option><option value="Tamamlandı">TAMAMLANDI</option></select></div>
     <div class="field-group"><label>TARİH</label><input type="date" id="modalTarih" required></div>
@@ -389,39 +387,41 @@ window.cloudDB = {
     <div class="field-group"><label>BİTİŞ TARİHİ</label><input type="date" id="modalBitisTarihi"></div>
 </div><div class="modal-actions"><button type="button" class="btn-modal-cancel" id="modalCancelBtn">Vazgeç</button><button type="submit" class="btn-modal-save">Kaydet</button></div></form></div></div>
 
+<!-- Teknisyen Modal -->
 <div id="teknisyenModal" class="modal-overlay"><div class="modal-container"><h3>Teknisyen Yönetimi</h3><div style="display:flex; gap:8px; margin-bottom:1rem;"><input type="text" id="yeniTeknisyenAd" placeholder="Ad Soyad"><input type="text" id="yeniTeknisyenTel" placeholder="Telefon"><button id="teknisyenEkleBtn" class="btn-modal-save">Ekle</button></div><div id="teknisyenListesi"></div><button class="btn-modal-cancel" id="teknisyenModalKapat">Kapat</button></div></div>
 
 <script>
+    // ---------- TÜM EXCEL KAYITLARI (öncekiyle aynı) ----------
     const DEFAULT_FAULTS = [
-        { id: "ex1",  durum: "Bekliyor",   tarih: "2026-05-16", firma: "ISILSAN HENDEK",                  sehir: "SAKARYA",            iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "YAĞ KAÇAĞI-",                                                              mudahale: "ATİLLA GİTTİ -",                                             teknisyen: "Atilla",     konum: "Hendek", formNo: "11,050 TL GR", bitisTarihi: "" },
-        { id: "ex2",  durum: "Bekliyor",   tarih: "2026-05-16", firma: "HYZ",                             sehir: "SAKARYA",            iletisim: "DİZEL MAKİNA", modelSeri: "5387627360", calismaSaati: "", ariza: "KOLTUK SWİTCH",                                                    mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex3",  durum: "Bekliyor",   tarih: "2026-05-16", firma: "NZN OTOMOTİV",                   sehir: "",                   iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "FRENLER TUTMUYOR - YAZILIM MI - MEKANİK Mİ BAKILACAK",                    mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex4",  durum: "Bekliyor",   tarih: "2026-05-16", firma: "TAHA AMBALAJ",                   sehir: "",                   iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "REACTRUCK TEKER - YALE YAĞ KAÇAĞI",                                        mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex5",  durum: "Bekliyor",   tarih: "2026-05-16", firma: "ŞAHİNLER KABLO - AĞ KABLO",     sehir: "TUZLA",              iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "KAPI KAPANMIYOR. - makara kafası e koruma kapağı",                         mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex6",  durum: "Bekliyor",   tarih: "2026-05-16", firma: "BARIŞLAR MERMER",                sehir: "",                   iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "1000 SAATTE BAKIM İSTİYOR.",                                               mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex7",  durum: "Bekliyor",   tarih: "2026-05-15", firma: "ŞAHİNLER METAL ALT BÖLME AĞ KABLO", sehir: "",              iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "SİLGİ KOLU - SİLGİ SÜPÜRGESİ",                                            mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex8",  durum: "Bekliyor",   tarih: "2026-05-15", firma: "ÖZ BEREKET",                     sehir: "ARNAVUT KÖY",        iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "MAKİNA KENDİ KENDİNE HIZ KESİYOR. KENDİ KENDİNE FRENLEME YAPIYOR",       mudahale: "4-11-2025 DAGAZ PEDALI DEĞİŞMİŞ - 03-3-2026 YAZILIM ATILMIŞ", teknisyen: "",          konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex9",  durum: "Bekliyor",   tarih: "2026-05-14", firma: "ŞAHİNLER METAL",                 sehir: "",                   iletisim: "M.ALİ",        modelSeri: "",      calismaSaati: "", ariza: "KALDIRMA KOLU TAKILI KALIYOR",                                             mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex10", durum: "Bekliyor",   tarih: "2026-05-14", firma: "TURSAM GALV.",                   sehir: "",                   iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "KABİN SU ALIYOR ÖN CAM AYAKLARI PROBLEMLİ",                               mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex11", durum: "Bekliyor",   tarih: "2026-05-14", firma: "ERVAN DOĞALTAŞ",                 sehir: "PAMUKKALE",          iletisim: "2026-05-21",   modelSeri: "",      calismaSaati: "", ariza: "ÖN LASTİK - 1 1000 SAAT 2 2000 SAAT + DİREKSİYON MAFSALI",              mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex12", durum: "Bekliyor",   tarih: "2026-05-14", firma: "ADAKAYA PANEL",                  sehir: "SAKARYA",            iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "HYD-TRD 28 - DEFRANSİYEL YARIM AY ŞEKLİNDE KEP GEÇSEDE İŞLEM YAPILACAK", mudahale: "",                                                          teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex13", durum: "Bekliyor",   tarih: "2026-05-04", firma: "İBRAHİM YILDIRIM",               sehir: "ŞANLI URFA",         iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "GAZ YEMİYOR - BAKIM TEKLİFİ İLETİLDİ.",                                   mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex14", durum: "Bekliyor",   tarih: "2026-05-03", firma: "biotem - TUSAŞ",                 sehir: "ANKARA",             iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "KOLTUK SWİTCH - KIYAFET- SİGARA",                                         mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex15", durum: "Bekliyor",   tarih: "2026-04-30", firma: "BAYSAL SEBZE",                   sehir: "ANTALYA",            iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "MAKİNA YÜRÜMÜYOR",                                                         mudahale: "DİZELİNDE ENJEKTÖR DEĞİŞİMİ GARANTİ KAPSAMINDA OLACAK",     teknisyen: "AKİF MAKİNA", konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex16", durum: "Bekliyor",   tarih: "2026-04-26", firma: "EKOBORD",                        sehir: "",                   iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "KABİN AYAĞI VE MAKARA KORUMASI - ŞANZIMAN SIN GELİYOR - AKÜDE KOKU VAR", mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex17", durum: "Bekliyor",   tarih: "2026-04-26", firma: "YAMAS",                          sehir: "",                   iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "SAF SU GİDECEK",                                                           mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex18", durum: "Bekliyor",   tarih: "2026-04-17", firma: "ARG ORMAN ÜRÜNLERİ",            sehir: "MUĞLA",              iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "500 SAAT BAKIM",                                                            mudahale: "TEKLİF GÖNDERİLDİ",                                         teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex19", durum: "Bekliyor",   tarih: "2026-03-10", firma: "KALİSAN",                        sehir: "İZMİR",              iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "BAKIM - MUSTAFA URYA TARAFINDAN YAPILDI",                                  mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex20", durum: "Bekliyor",   tarih: "2026-03-05", firma: "EFTA TUZ",                       sehir: "ANKARA",             iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "BAKIM",                                                                    mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex21", durum: "Bekliyor",   tarih: "2026-02-20", firma: "KONTEN SAN",                     sehir: "",                   iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "ÖN LASTİK - 1 ADET LASTİK KÖTÜ DURUMDA BEDELSİZ DEĞİŞECEK",             mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex22", durum: "Bekliyor",   tarih: "2026-02-14", firma: "DAKDUKLU",                       sehir: "",                   iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "ÖN CAM TEKLİFİ",                                                           mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex23", durum: "Bekliyor",   tarih: "2026-01-28", firma: "TEK KALE",                       sehir: "ÇEKMEKÖY İST",       iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "BAKIM 500 SAAT",                                                            mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex24", durum: "Bekliyor",   tarih: "2026-01-15", firma: "RÜZGAR FORKLİFT",               sehir: "",                   iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "3 ADET LEVYE SWİTCH GİDECEK",                                              mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex25", durum: "Bekliyor",   tarih: "2025-12-10", firma: "BAYSAL SEBZE",                   sehir: "ANTALYA",            iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "EKRAN TAKILI KALMIŞ",                                                      mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex26", durum: "Bekliyor",   tarih: "2025-11-05", firma: "DÖV- HAS BLUE SPOT",            sehir: "İSTANBUL",           iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "2 ADET BLUE SPOT 2500 + KDV",                                              mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex27", durum: "Bekliyor",   tarih: "2025-10-12", firma: "zno kimya",                      sehir: "NİĞDE",              iletisim: "",             modelSeri: "",      calismaSaati: "", ariza: "bakım 1700 saatte",                                                         mudahale: "",                                                           teknisyen: "",           konum: "", formNo: "", bitisTarihi: "" },
-        { id: "ex28", durum: "Tamamlandı", tarih: "2024-03-03", firma: "SPS ETİKET",                     sehir: "İSTANBUL - ARNAVUTKÖY", iletisim: "",          modelSeri: "",      calismaSaati: "", ariza: "AKÜ 0 GÖSTERİYOR - HYD TRA ***",                                          mudahale: "PROBLEM ÇÖZÜLDÜ",                                            teknisyen: "UMUT - EROL", konum: "", formNo: "", bitisTarihi: "2024-03-10" },
-        { id: "ex29", durum: "İşlemde",    tarih: "2026-05-28", firma: "DEMİR ÇELİK",                   sehir: "KOCAELİ",            iletisim: "05321112233",  modelSeri: "FD45T", calismaSaati: "2450", ariza: "Hidrolik pompa sesli",                                              mudahale: "Parça siparişi",                                             teknisyen: "Serkan K.",  konum: "Kocaeli OSB", formNo: "F-342", bitisTarihi: "" }
+        { id: "ex1", durum: "Bekliyor", tarih: "2026-05-16", firma: "ISILSAN HENDEK", sehir: "SAKARYA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "YAĞ KAÇAĞI-", mudahale: "ATİLLA GİTTİ -", teknisyen: "Atilla", konum: "Hendek", formNo: "11,050 TL GR", bitisTarihi: "" },
+        { id: "ex2", durum: "Bekliyor", tarih: "2026-05-16", firma: "HYZ", sehir: "SAKARYA", iletisim: "DİZEL MAKİNA", modelSeri: "5387627360", calismaSaati: "", ariza: "KOLTUK SWİTCH", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex3", durum: "Bekliyor", tarih: "2026-05-16", firma: "NZN OTOMOTİV", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "FRENLER TUTMUYOR - YAZILIM MI - MEKANİK Mİ BAKILACAK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex4", durum: "Bekliyor", tarih: "2026-05-16", firma: "TAHA AMBALAJ", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "REACTRUCK TEKER - YALE YAĞ KAÇAĞI", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex5", durum: "Bekliyor", tarih: "2026-05-16", firma: "ŞAHİNLER KABLO - AĞ KABLO", sehir: "TUZLA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "KAPI KAPANMIYOR. - makara kafası e koruma kapağı", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex6", durum: "Bekliyor", tarih: "2026-05-16", firma: "BARIŞLAR MERMER", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "1000 SAATTE BAKIM İSTİYOR.", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex7", durum: "Bekliyor", tarih: "2026-05-15", firma: "ŞAHİNLER METAL ALT BÖLME AĞ KABLO", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "SİLGİ KOLU - SİLGİ SÜPÜRGESİ", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex8", durum: "Bekliyor", tarih: "2026-05-15", firma: "ÖZ BEREKET", sehir: "ARNAVUT KÖY", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "MAKİNA KENDİ KENDİNE HIZ KESİYOR. KENDİ KENDİNE FRENLEME YAPIYOR", mudahale: "4-11-2025 DAGAZ PEDALI DEĞİŞMİŞ - 03-3-2026 YAZILIM ATILMIŞ", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex9", durum: "Bekliyor", tarih: "2026-05-14", firma: "ŞAHİNLER METAL", sehir: "", iletisim: "M.ALİ", modelSeri: "", calismaSaati: "", ariza: "KALDIRMA KOLU TAKILI KALIYOR", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex10", durum: "Bekliyor", tarih: "2026-05-14", firma: "TURSAM GALV.", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "KABİN SU ALIYOR ÖN CAM AYAKLARI PROBLEMLİ", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex11", durum: "Bekliyor", tarih: "2026-05-14", firma: "ERVAN DOĞALTAŞ", sehir: "PAMUKKALE", iletisim: "2026-05-21", modelSeri: "", calismaSaati: "", ariza: "ÖN LASTİK - 1 1000 SAAT 2 2000 SAAT + DİREKSİYON MAFSALI", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex12", durum: "Bekliyor", tarih: "2026-05-14", firma: "ADAKAYA PANEL", sehir: "SAKARYA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "HYD-TRD 28 - DEFRANSİYEL YARIM AY ŞEKLİNDE KEP GEÇSEDE İŞLEM YAPILACAK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex13", durum: "Bekliyor", tarih: "2026-05-04", firma: "İBRAHİM YILDIRIM", sehir: "ŞANLI URFA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "GAZ YEMİYOR - BAKIM TEKLİFİ İLETİLDİ.", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex14", durum: "Bekliyor", tarih: "2026-05-03", firma: "biotem - TUSAŞ", sehir: "ANKARA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "KOLTUK SWİTCH - KIYAFET- SİGARA", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex15", durum: "Bekliyor", tarih: "2026-04-30", firma: "BAYSAL SEBZE", sehir: "ANTALYA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "MAKİNA YÜRÜMÜYOR", mudahale: "DİZELİNDE ENJEKTÖR DEĞİŞİMİ GARANTİ KAPSAMINDA OLACAK", teknisyen: "AKİF MAKİNA", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex16", durum: "Bekliyor", tarih: "2026-04-26", firma: "EKOBORD", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "KABİN AYAĞI VE MAKARA KORUMASI - ŞANZIMAN SIN GELİYOR - AKÜDE KOKU VAR", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex17", durum: "Bekliyor", tarih: "2026-04-26", firma: "YAMAS", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "SAF SU GİDECEK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex18", durum: "Bekliyor", tarih: "2026-04-17", firma: "ARG ORMAN ÜRÜNLERİ", sehir: "MUĞLA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "500 SAAT BAKIM", mudahale: "TEKLİF GÖNDERİLDİ", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex19", durum: "Bekliyor", tarih: "2026-03-10", firma: "KALİSAN", sehir: "İZMİR", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "BAKIM - MUSTAFA URYA TARAFINDAN YAPILDI", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex20", durum: "Bekliyor", tarih: "2026-03-05", firma: "EFTA TUZ", sehir: "ANKARA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "BAKIM", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex21", durum: "Bekliyor", tarih: "2026-02-20", firma: "KONTEN SAN", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "ÖN LASTİK - 1 ADET LASTİK KÖTÜ DURUMDA BEDELSİZ DEĞİŞECEK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex22", durum: "Bekliyor", tarih: "2026-02-14", firma: "DAKDUKLU", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "ÖN CAM TEKLİFİ", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex23", durum: "Bekliyor", tarih: "2026-01-28", firma: "TEK KALE", sehir: "ÇEKMEKÖY İST", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "BAKIM 500 SAAT", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex24", durum: "Bekliyor", tarih: "2026-01-15", firma: "RÜZGAR FORKLİFT", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "3 ADET LEVYE SWİTCH GİDECEK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex25", durum: "Bekliyor", tarih: "2025-12-10", firma: "BAYSAL SEBZE", sehir: "ANTALYA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "EKRAN TAKILI KALMIŞ", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex26", durum: "Bekliyor", tarih: "2025-11-05", firma: "DÖV- HAS BLUE SPOT", sehir: "İSTANBUL", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "2 ADET BLUE SPOT 2500 + KDV", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex27", durum: "Bekliyor", tarih: "2025-10-12", firma: "zno kimya", sehir: "NİĞDE", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "bakım 1700 saatte", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex28", durum: "Tamamlandı", tarih: "2024-03-03", firma: "SPS ETİKET", sehir: "İSTANBUL - ARNAVUTKÖY", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "AKÜ 0 GÖSTERİYOR - HYD TRA ***", mudahale: "PROBLEM ÇÖZÜLDÜ", teknisyen: "UMUT - EROL", konum: "", formNo: "", bitisTarihi: "2024-03-10" },
+        { id: "ex29", durum: "İşlemde", tarih: "2026-05-28", firma: "DEMİR ÇELİK", sehir: "KOCAELİ", iletisim: "05321112233", modelSeri: "FD45T", calismaSaati: "2450", ariza: "Hidrolik pompa sesli", mudahale: "Parça siparişi", teknisyen: "Serkan K.", konum: "Kocaeli OSB", formNo: "F-342", bitisTarihi: "" }
     ];
 
     let faultsArray = [];
@@ -432,12 +432,12 @@ window.cloudDB = {
     let currentSelectedMonth = null;
     let currentMonthlyChart = null;
     let currentFirmChart = null;
-    let _liveSyncActive = false;
     const monthNamesTr = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
-
+    
+    // Sıralama durumları her tablo için ayrı
     let sortState = {
-        waiting:   { column: null, direction: 'asc' },
-        progress:  { column: null, direction: 'asc' },
+        waiting: { column: null, direction: 'asc' },
+        progress: { column: null, direction: 'asc' },
         completed: { column: null, direction: 'asc' }
     };
 
@@ -454,7 +454,8 @@ window.cloudDB = {
         let today = new Date(); today.setHours(0,0,0,0);
         return Math.max(0, Math.floor((today - start) / (1000 * 60 * 60 * 24)));
     }
-
+    
+    // Senkronizasyon fonksiyonları (öncekiyle aynı)
     function syncFirmFieldsToAllFaults(firmaAdi, yeniSehir, yeniIletisim, yeniKonum) {
         let guncellendi = false;
         faultsArray = faultsArray.map(f => {
@@ -518,52 +519,26 @@ window.cloudDB = {
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    // ---- Firebase destekli loadData / saveAll ----
-    async function loadData() {
-        try {
-            const cloud = await window.cloudDB.load();
-            if (cloud && cloud.faults && cloud.faults.length > 0) {
-                faultsArray   = cloud.faults;
-                teknisyenler  = cloud.teknisyenler || [];
-            } else {
-                faultsArray  = JSON.parse(JSON.stringify(DEFAULT_FAULTS));
-                teknisyenler = [
-                    { id: "t1", ad: "Atilla",    tel: "905551112233" },
-                    { id: "t2", ad: "Serkan K.", tel: "905322223344" },
-                    { id: "t3", ad: "Umut",      tel: "905334445566" },
-                    { id: "t4", ad: "Akif",      tel: "905441234567" }
-                ];
-                await window.cloudDB.save({ faults: faultsArray, teknisyenler: teknisyenler });
-            }
-        } catch(e) {
-            console.warn("Firebase hatası, localStorage kullanılıyor:", e);
-            let stored = localStorage.getItem("forklift_faults_v12");
-            faultsArray  = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_FAULTS));
-            let storedTek = localStorage.getItem("forklift_teknisyen_v12");
-            teknisyenler = storedTek ? JSON.parse(storedTek) : [
-                { id: "t1", ad: "Atilla",    tel: "905551112233" },
-                { id: "t2", ad: "Serkan K.", tel: "905322223344" },
-                { id: "t3", ad: "Umut",      tel: "905334445566" },
-                { id: "t4", ad: "Akif",      tel: "905441234567" }
-            ];
-        }
+    function loadData() {
+        let stored = localStorage.getItem("forklift_faults_v12");
+        if (stored) faultsArray = JSON.parse(stored);
+        else faultsArray = JSON.parse(JSON.stringify(DEFAULT_FAULTS));
+        let storedTek = localStorage.getItem("forklift_teknisyen_v12");
+        if (storedTek) teknisyenler = JSON.parse(storedTek);
+        else teknisyenler = [
+            { id: "t1", ad: "Atilla", tel: "905551112233" },
+            { id: "t2", ad: "Serkan K.", tel: "905322223344" },
+            { id: "t3", ad: "Umut", tel: "905334445566" },
+            { id: "t4", ad: "Akif", tel: "905441234567" }
+        ];
         updateFirmalarFromFaults();
+        saveAll();
     }
-
-    async function saveAll() {
-        localStorage.setItem("forklift_faults_v12",   JSON.stringify(faultsArray));
+    function saveAll() {
+        localStorage.setItem("forklift_faults_v12", JSON.stringify(faultsArray));
         localStorage.setItem("forklift_teknisyen_v12", JSON.stringify(teknisyenler));
-        localStorage.setItem("forklift_firmalar_v12",  JSON.stringify(firmalar));
-        try {
-            _liveSyncActive = true;
-            await window.cloudDB.save({ faults: faultsArray, teknisyenler: teknisyenler });
-            setTimeout(() => { _liveSyncActive = false; }, 2000);
-        } catch(e) {
-            _liveSyncActive = false;
-            console.warn("Firebase kaydetme hatası:", e);
-        }
+        localStorage.setItem("forklift_firmalar_v12", JSON.stringify(firmalar));
     }
-
     function updateFirmaDatalist() {
         let datalist = document.getElementById("firmaListesi");
         if (datalist) datalist.innerHTML = firmalar.map(f => `<option value="${escapeHtml(f.ad)}">`).join('');
@@ -575,49 +550,94 @@ window.cloudDB = {
 
     function filterAndSort(list) {
         let s = searchTerm.trim().toLowerCase();
-        return list.filter(item =>
-            (item.firma || "").toLowerCase().includes(s) ||
-            (item.sehir || "").toLowerCase().includes(s) ||
+        let filtered = list.filter(item => 
+            (item.firma || "").toLowerCase().includes(s) || 
+            (item.sehir || "").toLowerCase().includes(s) || 
             (item.ariza || "").toLowerCase().includes(s) ||
             (item.teknisyen || "").toLowerCase().includes(s)
         );
+        return filtered;
     }
-
+    
+    // Sıralama yardımcısı
     function sortFaults(list, column, direction) {
         return [...list].sort((a, b) => {
             let valA, valB;
             switch(column) {
-                case 'tarih':        valA = a.tarih || '';            valB = b.tarih || '';            break;
-                case 'bekleme':      valA = calculateWaitingDays(a);  valB = calculateWaitingDays(b);  break;
-                case 'firma':        valA = (a.firma || '').toLowerCase();       valB = (b.firma || '').toLowerCase();       break;
-                case 'sehir':        valA = (a.sehir || '').toLowerCase();       valB = (b.sehir || '').toLowerCase();       break;
-                case 'iletisim':     valA = (a.iletisim || '').toLowerCase();    valB = (b.iletisim || '').toLowerCase();    break;
-                case 'model':        valA = (a.modelSeri || '').toLowerCase();   valB = (b.modelSeri || '').toLowerCase();   break;
-                case 'calismaSaati': valA = a.calismaSaati || '';     valB = b.calismaSaati || '';     break;
-                case 'ariza':        valA = (a.ariza || '').toLowerCase();       valB = (b.ariza || '').toLowerCase();       break;
-                case 'mudahale':     valA = (a.mudahale || '').toLowerCase();    valB = (b.mudahale || '').toLowerCase();    break;
-                case 'teknisyen':    valA = (a.teknisyen || '').toLowerCase();   valB = (b.teknisyen || '').toLowerCase();   break;
-                case 'konum':        valA = (a.konum || '').toLowerCase();       valB = (b.konum || '').toLowerCase();       break;
-                case 'bitis':        valA = a.bitisTarihi || '';      valB = b.bitisTarihi || '';      break;
+                case 'tarih':
+                    valA = a.tarih || '';
+                    valB = b.tarih || '';
+                    break;
+                case 'bekleme':
+                    valA = calculateWaitingDays(a);
+                    valB = calculateWaitingDays(b);
+                    break;
+                case 'firma':
+                    valA = (a.firma || '').toLowerCase();
+                    valB = (b.firma || '').toLowerCase();
+                    break;
+                case 'sehir':
+                    valA = (a.sehir || '').toLowerCase();
+                    valB = (b.sehir || '').toLowerCase();
+                    break;
+                case 'iletisim':
+                    valA = (a.iletisim || '').toLowerCase();
+                    valB = (b.iletisim || '').toLowerCase();
+                    break;
+                case 'model':
+                    valA = (a.modelSeri || '').toLowerCase();
+                    valB = (b.modelSeri || '').toLowerCase();
+                    break;
+                case 'calismaSaati':
+                    valA = (a.calismaSaati || '');
+                    valB = (b.calismaSaati || '');
+                    break;
+                case 'ariza':
+                    valA = (a.ariza || '').toLowerCase();
+                    valB = (b.ariza || '').toLowerCase();
+                    break;
+                case 'mudahale':
+                    valA = (a.mudahale || '').toLowerCase();
+                    valB = (b.mudahale || '').toLowerCase();
+                    break;
+                case 'teknisyen':
+                    valA = (a.teknisyen || '').toLowerCase();
+                    valB = (b.teknisyen || '').toLowerCase();
+                    break;
+                case 'konum':
+                    valA = (a.konum || '').toLowerCase();
+                    valB = (b.konum || '').toLowerCase();
+                    break;
+                case 'bitis':
+                    valA = a.bitisTarihi || '';
+                    valB = b.bitisTarihi || '';
+                    break;
                 default: return 0;
             }
             if (valA < valB) return direction === 'asc' ? -1 : 1;
-            if (valA > valB) return direction === 'asc' ?  1 : -1;
+            if (valA > valB) return direction === 'asc' ? 1 : -1;
             return 0;
         });
     }
-
+    
+    // Tablo render + sıralama uygulama
     function renderTables() {
-        let waitingRaw   = filterAndSort(faultsArray.filter(f => f.durum === "Bekliyor"));
-        let progressRaw  = filterAndSort(faultsArray.filter(f => f.durum === "İşlemde"));
+        let waitingRaw = filterAndSort(faultsArray.filter(f => f.durum === "Bekliyor"));
+        let progressRaw = filterAndSort(faultsArray.filter(f => f.durum === "İşlemde"));
         let completedRaw = filterAndSort(faultsArray.filter(f => f.durum === "Tamamlandı"));
-
-        if (sortState.waiting.column)   waitingRaw   = sortFaults(waitingRaw,   sortState.waiting.column,   sortState.waiting.direction);
-        if (sortState.progress.column)  progressRaw  = sortFaults(progressRaw,  sortState.progress.column,  sortState.progress.direction);
-        if (sortState.completed.column) completedRaw = sortFaults(completedRaw, sortState.completed.column, sortState.completed.direction);
-
-        document.getElementById("waitingCount").innerText   = waitingRaw.length;
-        document.getElementById("progressCount").innerText  = progressRaw.length;
+        
+        if (sortState.waiting.column) {
+            waitingRaw = sortFaults(waitingRaw, sortState.waiting.column, sortState.waiting.direction);
+        }
+        if (sortState.progress.column) {
+            progressRaw = sortFaults(progressRaw, sortState.progress.column, sortState.progress.direction);
+        }
+        if (sortState.completed.column) {
+            completedRaw = sortFaults(completedRaw, sortState.completed.column, sortState.completed.direction);
+        }
+        
+        document.getElementById("waitingCount").innerText = waitingRaw.length;
+        document.getElementById("progressCount").innerText = progressRaw.length;
         document.getElementById("completedCount").innerText = completedRaw.length;
 
         function renderBody(list, tbodyId, statusType) {
@@ -626,74 +646,96 @@ window.cloudDB = {
             if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="14">Kayıt yok</td></tr>`; return; }
             let lastCity = "", html = "";
             list.forEach(f => {
-                let cls    = (f.sehir && f.sehir === lastCity) ? "same-city-highlight" : "";
-                let telOk  = (f.teknisyen && getTeknisyenTel(f.teknisyen));
+                let cls = (f.sehir && f.sehir === lastCity) ? "same-city-highlight" : "";
+                let telOk = (f.teknisyen && getTeknisyenTel(f.teknisyen));
                 let bekleme = calculateWaitingDays(f);
                 html += `<tr class="${cls}">
-                    <td><button class="action-btn edit" data-id="${f.id}"><i class="fas fa-pen"></i></button><button class="action-btn delete" data-id="${f.id}"><i class="fas fa-trash-alt"></i></button></td>
-                    <td>${(f.teknisyen && telOk) ? `<button class="whatsapp-btn" data-id="${f.id}"><i class="fab fa-whatsapp"></i> WhatsApp'a Gönder</button>` : `<button class="whatsapp-btn disabled" disabled><i class="fab fa-whatsapp"></i> Gönderilemez</button>`}</td>
-                    <td>${escapeHtml(f.tarih || "-")}</td>
-                    <td><strong>${escapeHtml(f.firma || "-")}</strong></td>
-                    <td>${escapeHtml(f.sehir || "-")}</td>
-                    <td>${escapeHtml(f.iletisim || "-")}</td>
-                    <td>${escapeHtml(f.modelSeri || "-")}</td>
-                    <td>${escapeHtml(f.calismaSaati || "-")}</td>
-                    <td>${escapeHtml(f.ariza || "-")}</td>
-                    <td>${escapeHtml(f.mudahale || "-")}</td>
-                    <td>${escapeHtml(f.teknisyen || "-")}</td>
-                    <td>${escapeHtml(f.konum || "-")}</td>
-                    <td><span class="status-badge ${statusType}">${bekleme} gün</span></td>
-                    <td>${f.bitisTarihi || "-"}</td>
-                </tr>`;
+                    <td class="action-btns">
+                        <button class="action-btn edit" data-id="${f.id}"><i class="fas fa-pen"></i></button>
+                        <button class="action-btn delete" data-id="${f.id}"><i class="fas fa-trash-alt"></i></button>
+                     </td>
+                     <td>${(f.teknisyen && telOk) ? `<button class="whatsapp-btn" data-id="${f.id}"><i class="fab fa-whatsapp"></i> WhatsApp'a Gönder</button>` : `<button class="whatsapp-btn disabled" disabled><i class="fab fa-whatsapp"></i> Gönderilemez</button>`}</td>
+                     <td>${escapeHtml(f.tarih || "-")}</td>
+                     <td><strong>${escapeHtml(f.firma || "-")}</strong></td>
+                     <td>${escapeHtml(f.sehir || "-")}</td>
+                     <td>${escapeHtml(f.iletisim || "-")}</td>
+                     <td>${escapeHtml(f.modelSeri || "-")}</td>
+                     <td>${escapeHtml(f.calismaSaati || "-")}</td>
+                     <td>${escapeHtml(f.ariza || "-")}</td>
+                     <td>${escapeHtml(f.mudahale || "-")}</td>
+                     <td>${escapeHtml(f.teknisyen || "-")}</td>
+                     <td>${escapeHtml(f.konum || "-")}</td>
+                     <td><span class="status-badge ${statusType}">${bekleme} gün</span></td>
+                     <td>${f.bitisTarihi || "-"}</td>
+                 </tr>`;
                 lastCity = f.sehir;
             });
             tbody.innerHTML = html;
         }
-        renderBody(waitingRaw,   "waitingBody",   "waiting");
-        renderBody(progressRaw,  "progressBody",  "progress");
+        renderBody(waitingRaw, "waitingBody", "waiting");
+        renderBody(progressRaw, "progressBody", "progress");
         renderBody(completedRaw, "completedBody", "completed");
         attachTableEvents();
-        updateSortIcons('waitingTable',   sortState.waiting);
-        updateSortIcons('progressTable',  sortState.progress);
+        
+        // Sıralama ok işaretlerini güncelle
+        updateSortIcons('waitingTable', sortState.waiting);
+        updateSortIcons('progressTable', sortState.progress);
         updateSortIcons('completedTable', sortState.completed);
     }
-
+    
     function updateSortIcons(tableId, state) {
         let table = document.getElementById(tableId);
         if (!table) return;
-        table.querySelectorAll('th').forEach(th => { let s = th.querySelector('.sort-icon'); if (s) s.innerHTML = '↕️'; });
+        let headers = table.querySelectorAll('th');
+        headers.forEach(th => {
+            let span = th.querySelector('.sort-icon');
+            if (span) span.innerHTML = '↕️';
+        });
         if (state.column) {
-            for (let i = 0; i < table.rows[0].cells.length; i++) {
+            let colIndex = -1;
+            let colMap = { tarih:2, firma:3, sehir:4, iletisim:5, model:6, calismaSaati:7, ariza:8, mudahale:9, teknisyen:10, konum:11, bekleme:12, bitis:13 };
+            let targetTh = null;
+            for (let i=0; i<table.rows[0].cells.length; i++) {
                 let cell = table.rows[0].cells[i];
                 if (cell.getAttribute('data-sort') === state.column) {
-                    let s = cell.querySelector('.sort-icon');
-                    if (s) s.innerHTML = state.direction === 'asc' ? '▲' : '▼';
+                    targetTh = cell;
                     break;
                 }
             }
+            if (targetTh) {
+                let span = targetTh.querySelector('.sort-icon');
+                if (span) span.innerHTML = state.direction === 'asc' ? '▲' : '▼';
+            }
         }
     }
-
+    
     function attachSortListeners() {
-        ['waitingTable','progressTable','completedTable'].forEach(tableId => {
+        const tables = ['waitingTable', 'progressTable', 'completedTable'];
+        tables.forEach(tableId => {
             let table = document.getElementById(tableId);
             if (!table) return;
-            table.querySelectorAll('th').forEach(th => {
+            let headers = table.querySelectorAll('th');
+            headers.forEach(th => {
                 let sortKey = th.getAttribute('data-sort');
                 if (!sortKey || sortKey === 'islem' || sortKey === 'whatsapp') return;
+                th.style.cursor = 'pointer';
                 th.removeEventListener('click', th._sortHandler);
-                th._sortHandler = () => {
-                    let key = tableId === 'waitingTable' ? 'waiting' : (tableId === 'progressTable' ? 'progress' : 'completed');
-                    let state = sortState[key];
-                    if (state.column === sortKey) state.direction = state.direction === 'asc' ? 'desc' : 'asc';
-                    else { state.column = sortKey; state.direction = 'asc'; }
+                let handler = (e) => {
+                    let state = sortState[tableId === 'waitingTable' ? 'waiting' : (tableId === 'progressTable' ? 'progress' : 'completed')];
+                    if (state.column === sortKey) {
+                        state.direction = state.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        state.column = sortKey;
+                        state.direction = 'asc';
+                    }
                     renderTables();
                 };
-                th.addEventListener('click', th._sortHandler);
+                th._sortHandler = handler;
+                th.addEventListener('click', handler);
             });
         });
     }
-
+    
     function attachTableEvents() {
         document.querySelectorAll('.action-btn.edit').forEach(btn => btn.addEventListener('click', () => openEditModal(btn.getAttribute('data-id'))));
         document.querySelectorAll('.action-btn.delete').forEach(btn => btn.addEventListener('click', () => {
@@ -712,23 +754,24 @@ window.cloudDB = {
         }));
     }
 
+    // Diğer fonksiyonlar (modal, raporlar) öncekiyle aynı
     function openEditModal(id) {
         let fault = faultsArray.find(f => f.id == id);
         if (!fault) return;
         document.getElementById("modalTitle").innerText = "Arıza Düzenle";
-        document.getElementById("modalDurum").value           = fault.durum;
-        document.getElementById("modalTarih").value           = fault.tarih || "";
-        document.getElementById("modalFirma").value           = fault.firma || "";
-        document.getElementById("modalSehir").value           = fault.sehir || "";
-        document.getElementById("modalIletisim").value        = fault.iletisim || "";
-        document.getElementById("modalModelSeri").value       = fault.modelSeri || "";
-        document.getElementById("modalCalismaSaati").value    = fault.calismaSaati || "";
-        document.getElementById("modalAriza").value           = fault.ariza || "";
-        document.getElementById("modalMudahale").value        = fault.mudahale || "";
+        document.getElementById("modalDurum").value = fault.durum;
+        document.getElementById("modalTarih").value = fault.tarih || "";
+        document.getElementById("modalFirma").value = fault.firma || "";
+        document.getElementById("modalSehir").value = fault.sehir || "";
+        document.getElementById("modalIletisim").value = fault.iletisim || "";
+        document.getElementById("modalModelSeri").value = fault.modelSeri || "";
+        document.getElementById("modalCalismaSaati").value = fault.calismaSaati || "";
+        document.getElementById("modalAriza").value = fault.ariza || "";
+        document.getElementById("modalMudahale").value = fault.mudahale || "";
         document.getElementById("modalTeknisyenSelect").value = fault.teknisyen || "";
-        document.getElementById("modalKonum").value           = fault.konum || "";
-        document.getElementById("modalFormNo").value          = fault.formNo || "";
-        document.getElementById("modalBitisTarihi").value     = fault.bitisTarihi || "";
+        document.getElementById("modalKonum").value = fault.konum || "";
+        document.getElementById("modalFormNo").value = fault.formNo || "";
+        document.getElementById("modalBitisTarihi").value = fault.bitisTarihi || "";
         currentEditId = id;
         document.getElementById("faultModal").classList.add("active");
     }
@@ -742,30 +785,34 @@ window.cloudDB = {
     }
     function saveFault(e) {
         e.preventDefault();
-        let durum    = document.getElementById("modalDurum").value;
-        let tarih    = document.getElementById("modalTarih").value;
+        let durum = document.getElementById("modalDurum").value;
+        let tarih = document.getElementById("modalTarih").value;
         if (!tarih) return alert("Tarih gerekli");
         let bitis = document.getElementById("modalBitisTarihi").value;
         if (durum === "Tamamlandı" && !bitis) bitis = new Date().toISOString().slice(0,10);
         else if (durum !== "Tamamlandı") bitis = null;
         let firmaAdi = document.getElementById("modalFirma").value.trim();
-        let sehir    = document.getElementById("modalSehir").value;
+        let sehir = document.getElementById("modalSehir").value;
         let iletisim = document.getElementById("modalIletisim").value;
-        let konum    = document.getElementById("modalKonum").value;
+        let konum = document.getElementById("modalKonum").value;
         let newF = {
             id: currentEditId ? currentEditId : Date.now() + "_" + Math.random().toString(36),
             durum, tarih, bitisTarihi: bitis,
-            firma: firmaAdi, sehir, iletisim,
-            modelSeri:     document.getElementById("modalModelSeri").value,
-            calismaSaati:  document.getElementById("modalCalismaSaati").value,
-            ariza:         document.getElementById("modalAriza").value,
-            mudahale:      document.getElementById("modalMudahale").value,
-            teknisyen:     document.getElementById("modalTeknisyenSelect").value,
-            konum,
-            formNo:        document.getElementById("modalFormNo").value
+            firma: firmaAdi,
+            sehir: sehir,
+            iletisim: iletisim,
+            modelSeri: document.getElementById("modalModelSeri").value,
+            calismaSaati: document.getElementById("modalCalismaSaati").value,
+            ariza: document.getElementById("modalAriza").value,
+            mudahale: document.getElementById("modalMudahale").value,
+            teknisyen: document.getElementById("modalTeknisyenSelect").value,
+            konum: konum,
+            formNo: document.getElementById("modalFormNo").value
         };
-        if (currentEditId) { let idx = faultsArray.findIndex(f => f.id == currentEditId); if (idx !== -1) faultsArray[idx] = newF; }
-        else faultsArray.push(newF);
+        if (currentEditId) {
+            let idx = faultsArray.findIndex(f => f.id == currentEditId);
+            if (idx !== -1) faultsArray[idx] = newF;
+        } else faultsArray.push(newF);
         afterFaultSaved(firmaAdi, sehir, iletisim, konum);
         saveAll();
         renderTables();
@@ -775,7 +822,7 @@ window.cloudDB = {
     }
     function closeFaultModal() { document.getElementById("faultModal").classList.remove("active"); currentEditId = null; }
 
-    function buildMonthSlicer() {
+    function buildMonthSlicer() { /* aynı */ 
         let monthSet = new Set();
         faultsArray.forEach(f => { if (f.tarih && f.tarih.length >= 7) monthSet.add(f.tarih.substring(0,7)); });
         let sortedMonths = Array.from(monthSet).sort();
@@ -790,7 +837,7 @@ window.cloudDB = {
             document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
             allBtn.classList.add('active');
             currentSelectedMonth = null;
-            renderMonthlyReport(null);
+            renderMonthlyReport(currentSelectedMonth);
         });
         container.appendChild(allBtn);
         sortedMonths.forEach(monthKey => {
@@ -804,7 +851,7 @@ window.cloudDB = {
                 document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 currentSelectedMonth = monthKey;
-                renderMonthlyReport(monthKey);
+                renderMonthlyReport(currentSelectedMonth);
             });
             container.appendChild(btn);
         });
@@ -812,23 +859,22 @@ window.cloudDB = {
         currentSelectedMonth = null;
         renderMonthlyReport(null);
     }
-    function renderFirmReportForAll() {
+    function renderFirmReportForAll() { /* aynı */ 
         let firmMap = new Map();
         faultsArray.forEach(f => {
             if (!f.firma) return;
-            if (!firmMap.has(f.firma)) firmMap.set(f.firma, { total:0, completed:0, waiting:0 });
-            let s = firmMap.get(f.firma);
-            s.total++;
-            if (f.durum === "Tamamlandı") s.completed++;
-            if (f.durum === "Bekliyor")   s.waiting++;
+            if (!firmMap.has(f.firma)) firmMap.set(f.firma, { total: 0, completed: 0, waiting: 0 });
+            let stats = firmMap.get(f.firma);
+            stats.total++;
+            if (f.durum === "Tamamlandı") stats.completed++;
+            if (f.durum === "Bekliyor") stats.waiting++;
         });
         let sortedFirms = Array.from(firmMap.entries()).sort((a,b) => b[1].total - a[1].total);
         let tbody = document.getElementById("firmStatsBody");
         if (!tbody) return;
-        tbody.innerHTML = sortedFirms.length === 0
-            ? '<tr><td colspan="4">Firma verisi yok</td></tr>'
-            : sortedFirms.map(([name, s]) => `<tr><td>${escapeHtml(name)}</td><td>${s.total}</td><td>${s.completed}</td><td>${s.waiting}</td></tr>`).join('');
-        let topFirms = sortedFirms.slice(0,10);
+        if (sortedFirms.length === 0) { tbody.innerHTML = '<tr><td colspan="4">Firma verisi yok</td></tr>'; return; }
+        tbody.innerHTML = sortedFirms.map(([name, stats]) => `<tr><td>${escapeHtml(name)}</td><td>${stats.total}</td><td>${stats.completed}</td><td>${stats.waiting}</td></tr>`).join('');
+        let topFirms = sortedFirms.slice(0, 10);
         let ctx = document.getElementById('firmBarChart').getContext('2d');
         if (currentFirmChart) currentFirmChart.destroy();
         currentFirmChart = new Chart(ctx, {
@@ -838,74 +884,53 @@ window.cloudDB = {
         });
     }
     function renderMonthlyReport(monthKey) {
-        let filtered = faultsArray.filter(f => { if (!f.tarih) return false; return monthKey ? f.tarih.startsWith(monthKey) : true; });
+        let filtered = faultsArray.filter(f => { if (!f.tarih) return false; if (!monthKey) return true; return f.tarih.startsWith(monthKey); });
         let title = monthKey ? `${monthNamesTr[parseInt(monthKey.split('-')[1])-1]} ${monthKey.split('-')[0]} Raporu` : "Tüm Arızalar (Tüm Zamanlar)";
         document.getElementById("selectedMonthTitle").innerText = title;
         let total = filtered.length, completedCount = filtered.filter(f => f.durum === "Tamamlandı").length, pending = filtered.filter(f => f.durum === "Bekliyor").length;
         document.getElementById("monthStats").innerHTML = `<div class="stat-card"><div class="stat-number">${total}</div><div>Toplam Arıza</div></div><div class="stat-card"><div class="stat-number">${completedCount}</div><div>Tamamlanan</div></div><div class="stat-card"><div class="stat-number">${pending}</div><div>Bekleyen</div></div>`;
         let tableBody = document.getElementById("monthlyFaultsBody");
-        tableBody.innerHTML = filtered.length === 0
-            ? '<tr><td colspan="6">Bu dönemde kayıt yok</td></tr>'
-            : filtered.map(f => `<tr><td>${escapeHtml(f.tarih)}</td><td><span class="status-badge ${f.durum==='Bekliyor'?'waiting':(f.durum==='İşlemde'?'progress':'completed')}">${f.durum}</span></td><td>${escapeHtml(f.firma)}</td><td>${escapeHtml(f.sehir)}</td><td>${escapeHtml(f.ariza||'-')}</td><td>${escapeHtml(f.teknisyen||'-')}</td></tr>`).join('');
+        if (filtered.length === 0) tableBody.innerHTML = '<tr><td colspan="6">Bu dönemde kayıt yok</td></tr>';
+        else tableBody.innerHTML = filtered.map(f => `<tr><td>${escapeHtml(f.tarih)}</td><td><span class="status-badge ${f.durum === 'Bekliyor' ? 'waiting' : (f.durum === 'İşlemde' ? 'progress' : 'completed')}">${f.durum}</span></td><td>${escapeHtml(f.firma)}</td><td>${escapeHtml(f.sehir)}</td><td>${escapeHtml(f.ariza || '-')}</td><td>${escapeHtml(f.teknisyen || '-')}</td></tr>`).join('');
         let dailyMap = new Map();
-        filtered.forEach(f => { if (f.tarih) dailyMap.set(f.tarih, (dailyMap.get(f.tarih)||0)+1); });
+        filtered.forEach(f => { if (f.tarih) dailyMap.set(f.tarih, (dailyMap.get(f.tarih) || 0) + 1); });
         let sortedDates = Array.from(dailyMap.keys()).sort();
+        let chartData = sortedDates.map(d => dailyMap.get(d));
         let ctx = document.getElementById('dailyLineChart').getContext('2d');
         if (currentMonthlyChart) currentMonthlyChart.destroy();
-        currentMonthlyChart = new Chart(ctx, { type:'line', data:{ labels:sortedDates, datasets:[{ label:'Günlük Arıza Sayısı', data:sortedDates.map(d=>dailyMap.get(d)), borderColor:'#1E3A5F', tension:0.2, fill:false }] }, options:{ responsive:true } });
+        currentMonthlyChart = new Chart(ctx, { type: 'line', data: { labels: sortedDates, datasets: [{ label: 'Günlük Arıza Sayısı', data: chartData, borderColor: '#1E3A5F', tension: 0.2, fill: false }] }, options: { responsive: true } });
         let firmContainer = document.getElementById("firmReportContainer");
-        if (!monthKey) { firmContainer.style.display = "block"; renderFirmReportForAll(); }
-        else            firmContainer.style.display = "none";
+        if (!monthKey) { firmContainer.style.display = "block"; renderFirmReportForAll(); } else { firmContainer.style.display = "none"; }
     }
 
     function openTeknisyenModal() { renderTeknisyenList(); document.getElementById("teknisyenModal").classList.add("active"); }
     function renderTeknisyenList() {
         let div = document.getElementById("teknisyenListesi");
         if (!div) return;
-        div.innerHTML = teknisyenler.map(t => `<div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>${escapeHtml(t.ad)} - ${t.tel}</span><button class="teknisyen-sil" data-id="${t.id}" style="background:red;color:white;border:none;border-radius:20px;padding:2px 10px;">Sil</button></div>`).join('');
+        div.innerHTML = teknisyenler.map(t => `<div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>${escapeHtml(t.ad)} - ${t.tel}</span><button class="teknisyen-sil" data-id="${t.id}" style="background:red; color:white; border:none; border-radius:20px; padding:2px 10px;">Sil</button></div>`).join('');
         document.querySelectorAll('.teknisyen-sil').forEach(btn => btn.addEventListener('click', () => {
-            teknisyenler = teknisyenler.filter(t => t.id != btn.getAttribute('data-id'));
+            let id = btn.getAttribute('data-id');
+            teknisyenler = teknisyenler.filter(t => t.id != id);
             saveAll(); updateTeknisyenDropdown(); renderTeknisyenList(); renderTables();
         }));
     }
 
-    document.addEventListener("DOMContentLoaded", async () => {
-        await loadData();
-        updateTeknisyenDropdown();
-        renderTables();
-        attachSortListeners();
-        buildMonthSlicer();
-
-        // Gerçek zamanlı senkronizasyon — diğer cihazlardan gelen değişiklikleri anlık yansıt
-        window.cloudDB.startLiveSync((cloudData) => {
-            if (_liveSyncActive) return;  // kendi kaydetmemizi yok say
-            if (!cloudData || !cloudData.faults) return;
-            faultsArray  = cloudData.faults;
-            teknisyenler = cloudData.teknisyenler || teknisyenler;
-            localStorage.setItem("forklift_faults_v12",   JSON.stringify(faultsArray));
-            localStorage.setItem("forklift_teknisyen_v12", JSON.stringify(teknisyenler));
-            updateFirmalarFromFaults();
-            updateTeknisyenDropdown();
-            renderTables();
-            if (document.getElementById("raporTab").classList.contains("active")) buildMonthSlicer();
-            else renderMonthlyReport(currentSelectedMonth);
-        });
-
+    document.addEventListener("DOMContentLoaded", () => {
+        loadData(); updateTeknisyenDropdown(); renderTables(); attachSortListeners(); buildMonthSlicer();
         document.getElementById("newFaultBtn").addEventListener("click", newFault);
         document.getElementById("modalCancelBtn").addEventListener("click", closeFaultModal);
         document.getElementById("faultForm").addEventListener("submit", saveFault);
         document.getElementById("teknisyenBtn").addEventListener("click", openTeknisyenModal);
         document.getElementById("teknisyenModalKapat").addEventListener("click", () => document.getElementById("teknisyenModal").classList.remove("active"));
         document.getElementById("teknisyenEkleBtn").addEventListener("click", () => {
-            let ad  = document.getElementById("yeniTeknisyenAd").value.trim();
+            let ad = document.getElementById("yeniTeknisyenAd").value.trim();
             let tel = document.getElementById("yeniTeknisyenTel").value.trim();
             if (!ad || !tel) { alert("Ad ve telefon girin"); return; }
-            let telClean = tel.replace(/\D/g,'');
+            let telClean = tel.replace(/\D/g, '');
             if (telClean.length < 10) { alert("Geçerli numara girin"); return; }
-            teknisyenler.push({ id: "t" + Date.now(), ad, tel: telClean });
+            teknisyenler.push({ id: "t" + Date.now(), ad: ad, tel: telClean });
             saveAll(); updateTeknisyenDropdown(); renderTeknisyenList(); renderTables();
-            document.getElementById("yeniTeknisyenAd").value = "";
-            document.getElementById("yeniTeknisyenTel").value = "";
+            document.getElementById("yeniTeknisyenAd").value = ""; document.getElementById("yeniTeknisyenTel").value = "";
         });
         document.getElementById("searchInput").addEventListener("input", (e) => { searchTerm = e.target.value; renderTables(); });
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -922,19 +947,19 @@ window.cloudDB = {
         let firmaInput = document.getElementById("modalFirma");
         if (firmaInput) {
             firmaInput.addEventListener("input", (e) => {
-                let firmaBilgi = getFirmaBilgileri(e.target.value);
+                let val = e.target.value;
+                let firmaBilgi = getFirmaBilgileri(val);
                 if (firmaBilgi) {
-                    document.getElementById("modalSehir").value    = firmaBilgi.sehir    || "";
+                    document.getElementById("modalSehir").value = firmaBilgi.sehir || "";
                     document.getElementById("modalIletisim").value = firmaBilgi.iletisim || "";
-                    document.getElementById("modalKonum").value    = firmaBilgi.konum    || "";
+                    document.getElementById("modalKonum").value = firmaBilgi.konum || "";
                 }
             });
         }
         document.getElementById("modalDurum").addEventListener("change", function() {
             if (this.value === "Tamamlandı" && !document.getElementById("modalBitisTarihi").value)
                 document.getElementById("modalBitisTarihi").value = new Date().toISOString().slice(0,10);
-            else if (this.value !== "Tamamlandı")
-                document.getElementById("modalBitisTarihi").value = "";
+            else if (this.value !== "Tamamlandı") document.getElementById("modalBitisTarihi").value = "";
         });
     });
 </script>
@@ -950,22 +975,29 @@ window.cloudDB = {
 </div>
 
 <script>
-const USERS = { "gülnaz":"2314", "doğan":"0730" };
+const USERS = {
+ "gülnaz":"2314",
+ "doğan":"0730"
+};
+
 document.addEventListener("DOMContentLoaded", function(){
-  if (sessionStorage.getItem("hechaUser")) {
-    const o = document.getElementById("loginOverlay");
-    if (o) o.style.display = "none";
+
+  if(sessionStorage.getItem("hechaUser")){
+      const o=document.getElementById("loginOverlay");
+      if(o) o.style.display="none";
   }
-  const btn = document.getElementById("loginBtn");
-  if (btn) {
+
+  const btn=document.getElementById("loginBtn");
+  if(btn){
     btn.addEventListener("click", function(){
-      const u = document.getElementById("loginUser").value.trim().toLowerCase();
-      const p = document.getElementById("loginPass").value.trim();
-      if (USERS[u] === p) {
-        sessionStorage.setItem("hechaUser", u);
-        document.getElementById("loginOverlay").style.display = "none";
-      } else {
-        document.getElementById("loginError").innerText = "Kullanıcı adı veya şifre hatalı";
+      const u=document.getElementById("loginUser").value.trim().toLowerCase();
+      const p=document.getElementById("loginPass").value.trim();
+
+      if(USERS[u]===p){
+        sessionStorage.setItem("hechaUser",u);
+        document.getElementById("loginOverlay").style.display="none";
+      }else{
+        document.getElementById("loginError").innerText="Kullanıcı adı veya şifre hatalı";
       }
     });
   }
