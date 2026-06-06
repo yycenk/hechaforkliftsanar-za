@@ -608,15 +608,28 @@
     }
     
     function sendWhatsApp(fault) {
-        if (!fault.teknisyen) { alert("Teknisyen atanmamış!"); return; }
-        let tel = getTeknisyenTel(fault.teknisyen);
-        if (!tel) { alert("Teknisyen telefonu kayıtlı değil!"); return; }
-        const clean = (text) => text ? String(text).replace(/[&<>]/g, '').trim() : '-';
-        const waitingDays = calculateWaitingDays(fault);
-        let msg = `🏭 *HECHA & FORKLİFTSAN ARIZA*%0a📌 Firma: ${clean(fault.firma)}%0a📞 İletişim: ${clean(fault.iletisim)}%0a📍 Konum: ${clean(fault.konum)}%0a🛠️ Arıza: ${clean(fault.ariza)}%0a📅 Tarih: ${fault.tarih || '-'}%0a🔧 Model: ${clean(fault.modelSeri)}%0a⏱️ Çalışma saati: ${clean(fault.calismaSaati)}%0a📝 Müdahale: ${clean(fault.mudahale)}%0a⏳ Bekleme: ${waitingDays} gün%0a📄 Form No: ${clean(fault.formNo)}%0a🏙️ Şehir: ${clean(fault.sehir)}%0a%0a🔔 Müdahale ediniz.`;
-        let phone = tel.replace(/\D/g,'');
-        if (!phone.startsWith("90")) phone = "90" + phone;
-        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+    if (!fault.teknisyen) { alert("Teknisyen atanmamış!"); return; }
+    let tel = getTeknisyenTel(fault.teknisyen);
+    if (!tel) { alert("Teknisyen telefonu kayıtlı değil!"); return; }
+    const clean = (text) => text ? String(text).replace(/[&<>]/g, '').trim() : '-';
+    const waitingDays = calculateWaitingDays(fault);
+    let msg = `HECHA FORKLIFTSAN ARIZA BILDIRIMI\n` +
+              `Firma: ${clean(fault.firma)}\n` +
+              `Iletisim: ${clean(fault.iletisim)}\n` +
+              `Konum: ${clean(fault.konum)}\n` +
+              `Ariza: ${clean(fault.ariza)}\n` +
+              `Tarih: ${fault.tarih || '-'}\n` +
+              `Model: ${clean(fault.modelSeri)}\n` +
+              `Calisma Saati: ${clean(fault.calismaSaati)}\n` +
+              `Mudahale: ${clean(fault.mudahale)}\n` +
+              `Bekleme: ${waitingDays} gun\n` +
+              `Form No: ${clean(fault.formNo)}\n` +
+              `Sehir: ${clean(fault.sehir)}\n\n` +
+              `Mudahale ediniz.`;
+    let phone = tel.replace(/\D/g,'');
+    if (!phone.startsWith("90")) phone = "90" + phone;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+}
     }
 
     function updateFirmaDatalist() {
