@@ -287,6 +287,40 @@
             .firm-stats-grid { grid-template-columns: 1fr; }
         }
     </style>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+ apiKey: "AIzaSyBSHVgcvx64rFmySgSj3ATMEQ_XS1d1B04",
+ authDomain: "arizatakiphecha.firebaseapp.com",
+ projectId: "arizatakiphecha",
+ storageBucket: "arizatakiphecha.firebasestorage.app",
+ messagingSenderId: "611036660735",
+ appId: "1:611036660735:web:83427cc97ffbc755b59dca",
+ measurementId: "G-DFBHLGQLZ5"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.cloudDB = {
+ async load(){
+   const snap = await getDoc(doc(db,"system","main"));
+   return snap.exists() ? snap.data() : null;
+ },
+ async save(data){
+   await setDoc(doc(db,"system","main"), data, {merge:true});
+ },
+ startLiveSync(onUpdate){
+   return onSnapshot(doc(db,"system","main"), (snap) => {
+     if(snap.exists()) onUpdate(snap.data());
+   });
+ }
+};
+</script>
+
 </head>
 <body>
 <div class="container">
@@ -533,9 +567,12 @@
         localStorage.setItem("forklift_firmalar_v12", JSON.stringify(firmalar));
         // Firebase'e kaydet
         try {
+            if(typeof isLocalSave !== 'undefined') isLocalSave = true;
             await window.cloudDB.save({ faults: faultsArray, teknisyenler: teknisyenler });
+            setTimeout(() => { if(typeof isLocalSave !== 'undefined') isLocalSave = false; }, 2000);
         } catch(e) {
             console.warn("Firebase kaydetme hatası:", e);
+            if(typeof isLocalSave !== 'undefined') isLocalSave = false;
         }
     }
     function updateFirmaDatalist() {
@@ -916,6 +953,24 @@
 
     document.addEventListener("DOMContentLoaded", async () => {
         await loadData(); updateTeknisyenDropdown(); renderTables(); attachSortListeners(); buildMonthSlicer();
+
+        // Gerçek zamanlı senkronizasyon - diğer cihazlardaki değişiklikleri anlık al
+        let isLocalSave = false;
+        const origSaveAll = saveAll;
+        window._liveSyncUnsub = window.cloudDB.startLiveSync((cloudData) => {
+            if(isLocalSave) return; // kendi kaydetmemizi yoksay
+            if(!cloudData || !cloudData.faults) return;
+            // Diğer cihazdan gelen değişikliği uygula
+            faultsArray = cloudData.faults;
+            teknisyenler = cloudData.teknisyenler || teknisyenler;
+            localStorage.setItem("forklift_faults_v12", JSON.stringify(faultsArray));
+            localStorage.setItem("forklift_teknisyen_v12", JSON.stringify(teknisyenler));
+            updateFirmalarFromFaults();
+            updateTeknisyenDropdown();
+            renderTables();
+            if(document.getElementById("raporTab").classList.contains("active")) buildMonthSlicer();
+            else renderMonthlyReport(currentSelectedMonth);
+        });
         document.getElementById("newFaultBtn").addEventListener("click", newFault);
         document.getElementById("modalCancelBtn").addEventListener("click", closeFaultModal);
         document.getElementById("faultForm").addEventListener("submit", saveFault);
