@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HECHA | FORKLİFTSAN Arıza Takip</title>
+    <title>HECHA | FORKLİFTSAN Arıza Takip (Firebase)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -289,12 +289,27 @@
         @media (max-width: 800px) {
             .firm-stats-grid { grid-template-columns: 1fr; }
         }
+        .toast-notify {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e4663;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            z-index: 1100;
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
+        }
+        .toast-notify.show { opacity: 1; }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <div class="title-section"><h1>⚙️ HECHA & FORKLİFTSAN ARIZA TAKİP</h1></div>
+        <div class="title-section"><h1>⚙️ HECHA & FORKLİFTSAN ARIZA TAKİP (Firebase)</h1></div>
         <div class="header-actions">
             <div class="search-area"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Firma, şehir, arıza..."></div>
             <button class="btn-icon" id="teknisyenBtn"><i class="fas fa-users"></i> Teknisyenler</button>
@@ -312,7 +327,7 @@
         <div class="fault-section"><div class="section-header"><h2><i class="fas fa-clock"></i> BEKLEYEN ARIZALAR <span class="badge-count" id="waitingCount">0</span></h2></div>
             <div class="table-wrapper"><table class="data-table" id="waitingTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="waitingBody"></tbody></table></div></div>
         <div class="fault-section"><div class="section-header"><h2><i class="fas fa-gear"></i> İŞLEMDEKİ ARIZALAR <span class="badge-count" id="progressCount">0</span></h2></div>
-            <div class="table-wrapper"><table class="data-table" id="progressTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th><tr></thead><tbody id="progressBody"></tbody></table></div></div>
+            <div class="table-wrapper"><table class="data-table" id="progressTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></table></thead><tbody id="progressBody"></tbody></table></div></div>
         <div class="fault-section"><div class="section-header"><h2><i class="fas fa-check-circle"></i> TAMAMLANAN ARIZALAR <span class="badge-count" id="completedCount">0</span></h2></div>
             <div class="table-wrapper"><table class="data-table" id="completedTable"><thead><tr><th data-sort="islem">İŞLEM</th><th data-sort="whatsapp">WhatsApp</th><th data-sort="tarih">TARİH <span class="sort-icon">↕️</span></th><th data-sort="firma">FİRMA <span class="sort-icon">↕️</span></th><th data-sort="sehir">ŞEHİR <span class="sort-icon">↕️</span></th><th data-sort="iletisim">İLETİŞİM <span class="sort-icon">↕️</span></th><th data-sort="model">MODEL <span class="sort-icon">↕️</span></th><th data-sort="calismaSaati">ÇAL.SAAT <span class="sort-icon">↕️</span></th><th data-sort="ariza">ARIZA <span class="sort-icon">↕️</span></th><th data-sort="mudahale">MÜDAHALE <span class="sort-icon">↕️</span></th><th data-sort="teknisyen">TEKNİSYEN <span class="sort-icon">↕️</span></th><th data-sort="konum">KONUM <span class="sort-icon">↕️</span></th><th data-sort="bekleme">BEKLEME <span class="sort-icon">↕️</span></th><th data-sort="bitis">BİTİŞ <span class="sort-icon">↕️</span></th></tr></thead><tbody id="completedBody"></tbody></table></div></div>
     </div>
@@ -363,9 +378,10 @@
 
 <!-- Teknisyen Modal -->
 <div id="teknisyenModal" class="modal-overlay"><div class="modal-container"><h3>Teknisyen Yönetimi</h3><div style="display:flex; gap:8px; margin-bottom:1rem;"><input type="text" id="yeniTeknisyenAd" placeholder="Ad Soyad"><input type="text" id="yeniTeknisyenTel" placeholder="Telefon"><button id="teknisyenEkleBtn" class="btn-modal-save">Ekle</button></div><div id="teknisyenListesi"></div><button class="btn-modal-cancel" id="teknisyenModalKapat">Kapat</button></div></div>
+<div id="toast" class="toast-notify">✅ Eski kayıtlar Firebase'e aktarıldı</div>
 
 <script>
-    // Firebase yapılandırması
+    // ---------- Firebase yapılandırması (sizin mevcut yapılandırmanız) ----------
     const firebaseConfig = {
         apiKey: "AIzaSyBSHVgcvx64rFmySgSj3ATMEQ_XS1d1B04",
         authDomain: "arizatakiphecha.firebaseapp.com",
@@ -378,7 +394,47 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // ---------- VERİLER ----------
+    // ---------- ESKI SİSTEMDEN AKTARILAN VERİLER (29 KAYIT + TEKNİSYENLER) ----------
+    const DEFAULT_FAULTS = [
+        { id: "ex1", durum: "Bekliyor", tarih: "2026-05-16", firma: "ISILSAN HENDEK", sehir: "SAKARYA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "YAĞ KAÇAĞI-", mudahale: "ATİLLA GİTTİ -", teknisyen: "Atilla", konum: "Hendek", formNo: "11,050 TL GR", bitisTarihi: "" },
+        { id: "ex2", durum: "Bekliyor", tarih: "2026-05-16", firma: "HYZ", sehir: "SAKARYA", iletisim: "DİZEL MAKİNA", modelSeri: "5387627360", calismaSaati: "", ariza: "KOLTUK SWİTCH", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex3", durum: "Bekliyor", tarih: "2026-05-16", firma: "NZN OTOMOTİV", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "FRENLER TUTMUYOR - YAZILIM MI - MEKANİK Mİ BAKILACAK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex4", durum: "Bekliyor", tarih: "2026-05-16", firma: "TAHA AMBALAJ", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "REACTRUCK TEKER - YALE YAĞ KAÇAĞI", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex5", durum: "Bekliyor", tarih: "2026-05-16", firma: "ŞAHİNLER KABLO - AĞ KABLO", sehir: "TUZLA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "KAPI KAPANMIYOR. - makara kafası e koruma kapağı", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex6", durum: "Bekliyor", tarih: "2026-05-16", firma: "BARIŞLAR MERMER", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "1000 SAATTE BAKIM İSTİYOR.", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex7", durum: "Bekliyor", tarih: "2026-05-15", firma: "ŞAHİNLER METAL ALT BÖLME AĞ KABLO", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "SİLGİ KOLU - SİLGİ SÜPÜRGESİ", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex8", durum: "Bekliyor", tarih: "2026-05-15", firma: "ÖZ BEREKET", sehir: "ARNAVUT KÖY", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "MAKİNA KENDİ KENDİNE HIZ KESİYOR. KENDİ KENDİNE FRENLEME YAPIYOR", mudahale: "4-11-2025 DAGAZ PEDALI DEĞİŞMİŞ - 03-3-2026 YAZILIM ATILMIŞ", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex9", durum: "Bekliyor", tarih: "2026-05-14", firma: "ŞAHİNLER METAL", sehir: "", iletisim: "M.ALİ", modelSeri: "", calismaSaati: "", ariza: "KALDIRMA KOLU TAKILI KALIYOR", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex10", durum: "Bekliyor", tarih: "2026-05-14", firma: "TURSAM GALV.", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "KABİN SU ALIYOR ÖN CAM AYAKLARI PROBLEMLİ", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex11", durum: "Bekliyor", tarih: "2026-05-14", firma: "ERVAN DOĞALTAŞ", sehir: "PAMUKKALE", iletisim: "2026-05-21", modelSeri: "", calismaSaati: "", ariza: "ÖN LASTİK - 1 1000 SAAT 2 2000 SAAT + DİREKSİYON MAFSALI", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex12", durum: "Bekliyor", tarih: "2026-05-14", firma: "ADAKAYA PANEL", sehir: "SAKARYA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "HYD-TRD 28 - DEFRANSİYEL YARIM AY ŞEKLİNDE KEP GEÇSEDE İŞLEM YAPILACAK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex13", durum: "Bekliyor", tarih: "2026-05-04", firma: "İBRAHİM YILDIRIM", sehir: "ŞANLI URFA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "GAZ YEMİYOR - BAKIM TEKLİFİ İLETİLDİ.", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex14", durum: "Bekliyor", tarih: "2026-05-03", firma: "biotem - TUSAŞ", sehir: "ANKARA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "KOLTUK SWİTCH - KIYAFET- SİGARA", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex15", durum: "Bekliyor", tarih: "2026-04-30", firma: "BAYSAL SEBZE", sehir: "ANTALYA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "MAKİNA YÜRÜMÜYOR", mudahale: "DİZELİNDE ENJEKTÖR DEĞİŞİMİ GARANTİ KAPSAMINDA OLACAK", teknisyen: "AKİF MAKİNA", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex16", durum: "Bekliyor", tarih: "2026-04-26", firma: "EKOBORD", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "KABİN AYAĞI VE MAKARA KORUMASI - ŞANZIMAN SIN GELİYOR - AKÜDE KOKU VAR", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex17", durum: "Bekliyor", tarih: "2026-04-26", firma: "YAMAS", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "SAF SU GİDECEK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex18", durum: "Bekliyor", tarih: "2026-04-17", firma: "ARG ORMAN ÜRÜNLERİ", sehir: "MUĞLA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "500 SAAT BAKIM", mudahale: "TEKLİF GÖNDERİLDİ", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex19", durum: "Bekliyor", tarih: "2026-03-10", firma: "KALİSAN", sehir: "İZMİR", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "BAKIM - MUSTAFA URYA TARAFINDAN YAPILDI", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex20", durum: "Bekliyor", tarih: "2026-03-05", firma: "EFTA TUZ", sehir: "ANKARA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "BAKIM", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex21", durum: "Bekliyor", tarih: "2026-02-20", firma: "KONTEN SAN", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "ÖN LASTİK - 1 ADET LASTİK KÖTÜ DURUMDA BEDELSİZ DEĞİŞECEK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex22", durum: "Bekliyor", tarih: "2026-02-14", firma: "DAKDUKLU", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "ÖN CAM TEKLİFİ", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex23", durum: "Bekliyor", tarih: "2026-01-28", firma: "TEK KALE", sehir: "ÇEKMEKÖY İST", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "BAKIM 500 SAAT", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex24", durum: "Bekliyor", tarih: "2026-01-15", firma: "RÜZGAR FORKLİFT", sehir: "", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "3 ADET LEVYE SWİTCH GİDECEK", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex25", durum: "Bekliyor", tarih: "2025-12-10", firma: "BAYSAL SEBZE", sehir: "ANTALYA", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "EKRAN TAKILI KALMIŞ", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex26", durum: "Bekliyor", tarih: "2025-11-05", firma: "DÖV- HAS BLUE SPOT", sehir: "İSTANBUL", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "2 ADET BLUE SPOT 2500 + KDV", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex27", durum: "Bekliyor", tarih: "2025-10-12", firma: "zno kimya", sehir: "NİĞDE", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "bakım 1700 saatte", mudahale: "", teknisyen: "", konum: "", formNo: "", bitisTarihi: "" },
+        { id: "ex28", durum: "Tamamlandı", tarih: "2024-03-03", firma: "SPS ETİKET", sehir: "İSTANBUL - ARNAVUTKÖY", iletisim: "", modelSeri: "", calismaSaati: "", ariza: "AKÜ 0 GÖSTERİYOR - HYD TRA ***", mudahale: "PROBLEM ÇÖZÜLDÜ", teknisyen: "UMUT - EROL", konum: "", formNo: "", bitisTarihi: "2024-03-10" },
+        { id: "ex29", durum: "İşlemde", tarih: "2026-05-28", firma: "DEMİR ÇELİK", sehir: "KOCAELİ", iletisim: "05321112233", modelSeri: "FD45T", calismaSaati: "2450", ariza: "Hidrolik pompa sesli", mudahale: "Parça siparişi", teknisyen: "Serkan K.", konum: "Kocaeli OSB", formNo: "F-342", bitisTarihi: "" }
+    ];
+    
+    const DEFAULT_TEKNISYENLER = [
+        { id: "t1", ad: "Atilla", tel: "905551112233" },
+        { id: "t2", ad: "Serkan K.", tel: "905322223344" },
+        { id: "t3", ad: "Umut", tel: "905334445566" },
+        { id: "t4", ad: "Akif", tel: "905441234567" }
+    ];
+
+    // ---------- UYGULAMA DEĞİŞKENLERİ ----------
     let faultsArray = [];
     let teknisyenler = [];
     let firmalar = [];
@@ -395,7 +451,7 @@
         completed: { column: null, direction: 'asc' }
     };
 
-    // Yardımcı fonksiyonlar
+    // ---------- YARDIMCI FONKSİYONLAR ----------
     function escapeHtml(str) { if (!str) return ""; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
     function getTeknisyenTel(ad) { let t = teknisyenler.find(tk => tk.ad === ad); return t ? t.tel : null; }
     function calculateWaitingDays(fault) {
@@ -408,40 +464,6 @@
         }
         let today = new Date(); today.setHours(0,0,0,0);
         return Math.max(0, Math.floor((today - start) / (1000 * 60 * 60 * 24)));
-    }
-    
-    // Firebase'den veri çekme
-    function loadDataFromFirebase() {
-        database.ref('faults').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                // Firebase'deki verileri diziye çevir, her birine id'yi ekle
-                faultsArray = Object.keys(data).map(key => {
-                    return { ...data[key], firebaseId: key };
-                });
-            } else {
-                faultsArray = [];
-            }
-            updateFirmalarFromFaults();
-            renderTables();
-            buildMonthSlicer();
-            if (document.getElementById("raporTab").classList.contains("active")) {
-                renderMonthlyReport(currentSelectedMonth);
-            }
-        });
-        
-        database.ref('teknisyenler').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                teknisyenler = Object.keys(data).map(key => {
-                    return { ...data[key], firebaseId: key };
-                });
-            } else {
-                teknisyenler = [];
-            }
-            updateTeknisyenDropdown();
-            renderTables();
-        });
     }
     
     function updateFirmalarFromFaults() {
@@ -471,16 +493,12 @@
             if (iletisim && existingFirma.iletisim !== iletisim) { existingFirma.iletisim = iletisim; guncellendi = true; }
             if (konum && existingFirma.konum !== konum) { existingFirma.konum = konum; guncellendi = true; }
             if (guncellendi) {
-                // Tüm arızalarda bu firmanın bilgilerini güncelle
                 faultsArray.forEach(f => {
                     if (f.firma === firmaAdi) {
                         if (sehir && f.sehir !== sehir) f.sehir = sehir;
                         if (iletisim && f.iletisim !== iletisim) f.iletisim = iletisim;
                         if (konum && f.konum !== konum) f.konum = konum;
-                        // Firebase'e güncelle
-                        if (f.firebaseId) {
-                            database.ref('faults/' + f.firebaseId).update({ sehir: f.sehir, iletisim: f.iletisim, konum: f.konum });
-                        }
+                        if (f.firebaseId) database.ref('faults/' + f.firebaseId).update({ sehir: f.sehir, iletisim: f.iletisim, konum: f.konum });
                     }
                 });
             }
@@ -502,10 +520,6 @@
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    function saveAll() {
-        // Firebase'de otomatik senkronizasyon var, ayrıca bir şey yapmaya gerek yok
-    }
-    
     function updateFirmaDatalist() {
         let datalist = document.getElementById("firmaListesi");
         if (datalist) datalist.innerHTML = firmalar.map(f => `<option value="${escapeHtml(f.ad)}">`).join('');
@@ -516,69 +530,33 @@
         if (sel) sel.innerHTML = '<option value="">Seçiniz</option>' + teknisyenler.map(t => `<option value="${escapeHtml(t.ad)}">${escapeHtml(t.ad)}</option>`).join('');
     }
 
+    // ---------- FİLTRE & SIRALAMA ----------
     function filterAndSort(list) {
         let s = searchTerm.trim().toLowerCase();
-        let filtered = list.filter(item => 
+        return list.filter(item => 
             (item.firma || "").toLowerCase().includes(s) || 
             (item.sehir || "").toLowerCase().includes(s) || 
             (item.ariza || "").toLowerCase().includes(s) ||
             (item.teknisyen || "").toLowerCase().includes(s)
         );
-        return filtered;
     }
     
     function sortFaults(list, column, direction) {
         return [...list].sort((a, b) => {
             let valA, valB;
             switch(column) {
-                case 'tarih':
-                    valA = a.tarih || '';
-                    valB = b.tarih || '';
-                    break;
-                case 'bekleme':
-                    valA = calculateWaitingDays(a);
-                    valB = calculateWaitingDays(b);
-                    break;
-                case 'firma':
-                    valA = (a.firma || '').toLowerCase();
-                    valB = (b.firma || '').toLowerCase();
-                    break;
-                case 'sehir':
-                    valA = (a.sehir || '').toLowerCase();
-                    valB = (b.sehir || '').toLowerCase();
-                    break;
-                case 'iletisim':
-                    valA = (a.iletisim || '').toLowerCase();
-                    valB = (b.iletisim || '').toLowerCase();
-                    break;
-                case 'model':
-                    valA = (a.modelSeri || '').toLowerCase();
-                    valB = (b.modelSeri || '').toLowerCase();
-                    break;
-                case 'calismaSaati':
-                    valA = (a.calismaSaati || '');
-                    valB = (b.calismaSaati || '');
-                    break;
-                case 'ariza':
-                    valA = (a.ariza || '').toLowerCase();
-                    valB = (b.ariza || '').toLowerCase();
-                    break;
-                case 'mudahale':
-                    valA = (a.mudahale || '').toLowerCase();
-                    valB = (b.mudahale || '').toLowerCase();
-                    break;
-                case 'teknisyen':
-                    valA = (a.teknisyen || '').toLowerCase();
-                    valB = (b.teknisyen || '').toLowerCase();
-                    break;
-                case 'konum':
-                    valA = (a.konum || '').toLowerCase();
-                    valB = (b.konum || '').toLowerCase();
-                    break;
-                case 'bitis':
-                    valA = a.bitisTarihi || '';
-                    valB = b.bitisTarihi || '';
-                    break;
+                case 'tarih': valA = a.tarih || ''; valB = b.tarih || ''; break;
+                case 'bekleme': valA = calculateWaitingDays(a); valB = calculateWaitingDays(b); break;
+                case 'firma': valA = (a.firma || '').toLowerCase(); valB = (b.firma || '').toLowerCase(); break;
+                case 'sehir': valA = (a.sehir || '').toLowerCase(); valB = (b.sehir || '').toLowerCase(); break;
+                case 'iletisim': valA = (a.iletisim || '').toLowerCase(); valB = (b.iletisim || '').toLowerCase(); break;
+                case 'model': valA = (a.modelSeri || '').toLowerCase(); valB = (b.modelSeri || '').toLowerCase(); break;
+                case 'calismaSaati': valA = (a.calismaSaati || ''); valB = (b.calismaSaati || ''); break;
+                case 'ariza': valA = (a.ariza || '').toLowerCase(); valB = (b.ariza || '').toLowerCase(); break;
+                case 'mudahale': valA = (a.mudahale || '').toLowerCase(); valB = (b.mudahale || '').toLowerCase(); break;
+                case 'teknisyen': valA = (a.teknisyen || '').toLowerCase(); valB = (b.teknisyen || '').toLowerCase(); break;
+                case 'konum': valA = (a.konum || '').toLowerCase(); valB = (b.konum || '').toLowerCase(); break;
+                case 'bitis': valA = a.bitisTarihi || ''; valB = b.bitisTarihi || ''; break;
                 default: return 0;
             }
             if (valA < valB) return direction === 'asc' ? -1 : 1;
@@ -592,15 +570,9 @@
         let progressRaw = filterAndSort(faultsArray.filter(f => f.durum === "İşlemde"));
         let completedRaw = filterAndSort(faultsArray.filter(f => f.durum === "Tamamlandı"));
         
-        if (sortState.waiting.column) {
-            waitingRaw = sortFaults(waitingRaw, sortState.waiting.column, sortState.waiting.direction);
-        }
-        if (sortState.progress.column) {
-            progressRaw = sortFaults(progressRaw, sortState.progress.column, sortState.progress.direction);
-        }
-        if (sortState.completed.column) {
-            completedRaw = sortFaults(completedRaw, sortState.completed.column, sortState.completed.direction);
-        }
+        if (sortState.waiting.column) waitingRaw = sortFaults(waitingRaw, sortState.waiting.column, sortState.waiting.direction);
+        if (sortState.progress.column) progressRaw = sortFaults(progressRaw, sortState.progress.column, sortState.progress.direction);
+        if (sortState.completed.column) completedRaw = sortFaults(completedRaw, sortState.completed.column, sortState.completed.direction);
         
         document.getElementById("waitingCount").innerText = waitingRaw.length;
         document.getElementById("progressCount").innerText = progressRaw.length;
@@ -616,24 +588,17 @@
                 let telOk = (f.teknisyen && getTeknisyenTel(f.teknisyen));
                 let bekleme = calculateWaitingDays(f);
                 html += `<tr class="${cls}">
-                    <td class="action-btns">
-                        <button class="action-btn edit" data-id="${f.firebaseId}"><i class="fas fa-pen"></i></button>
-                        <button class="action-btn delete" data-id="${f.firebaseId}"><i class="fas fa-trash-alt"></i></button>
-                      </td>
-                      <td>${(f.teknisyen && telOk) ? `<button class="whatsapp-btn" data-id="${f.firebaseId}"><i class="fab fa-whatsapp"></i> WhatsApp'a Gönder</button>` : `<button class="whatsapp-btn disabled" disabled><i class="fab fa-whatsapp"></i> Gönderilemez</button>`}</td>
-                      <td>${escapeHtml(f.tarih || "-")}</td>
-                      <td><strong>${escapeHtml(f.firma || "-")}</strong></td>
-                      <td>${escapeHtml(f.sehir || "-")}</td>
-                      <td>${escapeHtml(f.iletisim || "-")}</td>
-                      <td>${escapeHtml(f.modelSeri || "-")}</td>
-                      <td>${escapeHtml(f.calismaSaati || "-")}</td>
-                      <td>${escapeHtml(f.ariza || "-")}</td>
-                      <td>${escapeHtml(f.mudahale || "-")}</td>
-                      <td>${escapeHtml(f.teknisyen || "-")}</td>
-                      <td>${escapeHtml(f.konum || "-")}</td>
-                      <td><span class="status-badge ${statusType}">${bekleme} gün</span></td>
-                      <td>${f.bitisTarihi || "-"}</td>
-                  </tr>`;
+                    <td class="action-btns"><button class="action-btn edit" data-id="${f.firebaseId}"><i class="fas fa-pen"></i></button>
+                    <button class="action-btn delete" data-id="${f.firebaseId}"><i class="fas fa-trash-alt"></i></button></td>
+                    <td>${(f.teknisyen && telOk) ? `<button class="whatsapp-btn" data-id="${f.firebaseId}"><i class="fab fa-whatsapp"></i> WhatsApp'a Gönder</button>` : `<button class="whatsapp-btn disabled" disabled><i class="fab fa-whatsapp"></i> Gönderilemez</button>`}</td>
+                    <td>${escapeHtml(f.tarih || "-")}</td><td><strong>${escapeHtml(f.firma || "-")}</strong></td>
+                    <td>${escapeHtml(f.sehir || "-")}</td><td>${escapeHtml(f.iletisim || "-")}</td>
+                    <td>${escapeHtml(f.modelSeri || "-")}</td><td>${escapeHtml(f.calismaSaati || "-")}</td>
+                    <td>${escapeHtml(f.ariza || "-")}</td><td>${escapeHtml(f.mudahale || "-")}</td>
+                    <td>${escapeHtml(f.teknisyen || "-")}</td><td>${escapeHtml(f.konum || "-")}</td>
+                    <td><span class="status-badge ${statusType}">${bekleme} gün</span></td>
+                    <td>${f.bitisTarihi || "-"}</td>
+                </tr>`;
                 lastCity = f.sehir;
             });
             tbody.innerHTML = html;
@@ -642,7 +607,6 @@
         renderBody(progressRaw, "progressBody", "progress");
         renderBody(completedRaw, "completedBody", "completed");
         attachTableEvents();
-        
         updateSortIcons('waitingTable', sortState.waiting);
         updateSortIcons('progressTable', sortState.progress);
         updateSortIcons('completedTable', sortState.completed);
@@ -652,29 +616,18 @@
         let table = document.getElementById(tableId);
         if (!table) return;
         let headers = table.querySelectorAll('th');
-        headers.forEach(th => {
-            let span = th.querySelector('.sort-icon');
-            if (span) span.innerHTML = '↕️';
-        });
+        headers.forEach(th => { let span = th.querySelector('.sort-icon'); if (span) span.innerHTML = '↕️'; });
         if (state.column) {
             let targetTh = null;
             for (let i=0; i<table.rows[0].cells.length; i++) {
-                let cell = table.rows[0].cells[i];
-                if (cell.getAttribute('data-sort') === state.column) {
-                    targetTh = cell;
-                    break;
-                }
+                if (table.rows[0].cells[i].getAttribute('data-sort') === state.column) { targetTh = table.rows[0].cells[i]; break; }
             }
-            if (targetTh) {
-                let span = targetTh.querySelector('.sort-icon');
-                if (span) span.innerHTML = state.direction === 'asc' ? '▲' : '▼';
-            }
+            if (targetTh) { let span = targetTh.querySelector('.sort-icon'); if (span) span.innerHTML = state.direction === 'asc' ? '▲' : '▼'; }
         }
     }
     
     function attachSortListeners() {
-        const tables = ['waitingTable', 'progressTable', 'completedTable'];
-        tables.forEach(tableId => {
+        ['waitingTable', 'progressTable', 'completedTable'].forEach(tableId => {
             let table = document.getElementById(tableId);
             if (!table) return;
             let headers = table.querySelectorAll('th');
@@ -683,14 +636,10 @@
                 if (!sortKey || sortKey === 'islem' || sortKey === 'whatsapp') return;
                 th.style.cursor = 'pointer';
                 th.removeEventListener('click', th._sortHandler);
-                let handler = (e) => {
+                let handler = () => {
                     let state = sortState[tableId === 'waitingTable' ? 'waiting' : (tableId === 'progressTable' ? 'progress' : 'completed')];
-                    if (state.column === sortKey) {
-                        state.direction = state.direction === 'asc' ? 'desc' : 'asc';
-                    } else {
-                        state.column = sortKey;
-                        state.direction = 'asc';
-                    }
+                    if (state.column === sortKey) state.direction = state.direction === 'asc' ? 'desc' : 'asc';
+                    else { state.column = sortKey; state.direction = 'asc'; }
                     renderTables();
                 };
                 th._sortHandler = handler;
@@ -702,20 +651,15 @@
     function attachTableEvents() {
         document.querySelectorAll('.action-btn.edit').forEach(btn => btn.addEventListener('click', () => openEditModal(btn.getAttribute('data-id'))));
         document.querySelectorAll('.action-btn.delete').forEach(btn => btn.addEventListener('click', () => {
-            if (confirm("Silinsin mi?")) {
-                let firebaseId = btn.getAttribute('data-id');
-                database.ref('faults/' + firebaseId).remove().then(() => {
-                    // Silme başarılı, veriler otomatik güncellenecek
-                }).catch(err => alert("Silme hatası: " + err));
-            }
+            if (confirm("Silinsin mi?")) database.ref('faults/' + btn.getAttribute('data-id')).remove();
         }));
         document.querySelectorAll('.whatsapp-btn:not(.disabled)').forEach(btn => btn.addEventListener('click', () => {
-            let firebaseId = btn.getAttribute('data-id');
-            let fault = faultsArray.find(f => f.firebaseId === firebaseId);
+            let fault = faultsArray.find(f => f.firebaseId === btn.getAttribute('data-id'));
             if (fault) sendWhatsApp(fault);
         }));
     }
 
+    // ---------- MODAL İŞLEMLERİ ----------
     function openEditModal(firebaseId) {
         let fault = faultsArray.find(f => f.firebaseId === firebaseId);
         if (!fault) return;
@@ -758,36 +702,15 @@
         let sehir = document.getElementById("modalSehir").value;
         let iletisim = document.getElementById("modalIletisim").value;
         let konum = document.getElementById("modalKonum").value;
-        let newF = {
-            durum, tarih, bitisTarihi: bitis,
-            firma: firmaAdi,
-            sehir: sehir,
-            iletisim: iletisim,
-            modelSeri: document.getElementById("modalModelSeri").value,
-            calismaSaati: document.getElementById("modalCalismaSaati").value,
-            ariza: document.getElementById("modalAriza").value,
-            mudahale: document.getElementById("modalMudahale").value,
-            teknisyen: document.getElementById("modalTeknisyenSelect").value,
-            konum: konum,
-            formNo: document.getElementById("modalFormNo").value
-        };
-        
-        if (currentEditId) {
-            // Güncelleme
-            database.ref('faults/' + currentEditId).update(newF).then(() => {
-                afterFaultSaved(firmaAdi, sehir, iletisim, konum);
-            }).catch(err => alert("Güncelleme hatası: " + err));
-        } else {
-            // Yeni ekleme
-            database.ref('faults').push(newF).then(() => {
-                afterFaultSaved(firmaAdi, sehir, iletisim, konum);
-            }).catch(err => alert("Ekleme hatası: " + err));
-        }
+        let newF = { durum, tarih, bitisTarihi: bitis, firma: firmaAdi, sehir, iletisim, modelSeri: document.getElementById("modalModelSeri").value, calismaSaati: document.getElementById("modalCalismaSaati").value, ariza: document.getElementById("modalAriza").value, mudahale: document.getElementById("modalMudahale").value, teknisyen: document.getElementById("modalTeknisyenSelect").value, konum, formNo: document.getElementById("modalFormNo").value };
+        if (currentEditId) database.ref('faults/' + currentEditId).update(newF).then(() => afterFaultSaved(firmaAdi, sehir, iletisim, konum));
+        else database.ref('faults').push(newF).then(() => afterFaultSaved(firmaAdi, sehir, iletisim, konum));
         closeFaultModal();
     }
     
     function closeFaultModal() { document.getElementById("faultModal").classList.remove("active"); currentEditId = null; }
 
+    // ---------- RAPORLAR ----------
     function buildMonthSlicer() {
         let monthSet = new Set();
         faultsArray.forEach(f => { if (f.tarih && f.tarih.length >= 7) monthSet.add(f.tarih.substring(0,7)); });
@@ -795,30 +718,13 @@
         let container = document.getElementById("monthSlicer");
         if (!container) return;
         container.innerHTML = '';
-        let allBtn = document.createElement('button');
-        allBtn.className = 'month-btn';
-        allBtn.setAttribute('data-month', '');
-        allBtn.innerText = '📅 Tümü';
-        allBtn.addEventListener('click', function() {
-            document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
-            allBtn.classList.add('active');
-            currentSelectedMonth = null;
-            renderMonthlyReport(currentSelectedMonth);
-        });
+        let allBtn = document.createElement('button'); allBtn.className = 'month-btn'; allBtn.setAttribute('data-month', ''); allBtn.innerText = '📅 Tümü';
+        allBtn.addEventListener('click', () => { document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active')); allBtn.classList.add('active'); currentSelectedMonth = null; renderMonthlyReport(currentSelectedMonth); });
         container.appendChild(allBtn);
         sortedMonths.forEach(monthKey => {
             let [year, month] = monthKey.split('-');
-            let label = `${monthNamesTr[parseInt(month)-1]} ${year}`;
-            let btn = document.createElement('button');
-            btn.className = 'month-btn';
-            btn.setAttribute('data-month', monthKey);
-            btn.innerText = label;
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentSelectedMonth = monthKey;
-                renderMonthlyReport(currentSelectedMonth);
-            });
+            let btn = document.createElement('button'); btn.className = 'month-btn'; btn.setAttribute('data-month', monthKey); btn.innerText = `${monthNamesTr[parseInt(month)-1]} ${year}`;
+            btn.addEventListener('click', () => { document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); currentSelectedMonth = monthKey; renderMonthlyReport(currentSelectedMonth); });
             container.appendChild(btn);
         });
         if (allBtn) allBtn.classList.add('active');
@@ -831,8 +737,7 @@
         faultsArray.forEach(f => {
             if (!f.firma) return;
             if (!firmMap.has(f.firma)) firmMap.set(f.firma, { total: 0, completed: 0, waiting: 0 });
-            let stats = firmMap.get(f.firma);
-            stats.total++;
+            let stats = firmMap.get(f.firma); stats.total++;
             if (f.durum === "Tamamlandı") stats.completed++;
             if (f.durum === "Bekliyor") stats.waiting++;
         });
@@ -844,11 +749,7 @@
         let topFirms = sortedFirms.slice(0, 10);
         let ctx = document.getElementById('firmBarChart').getContext('2d');
         if (currentFirmChart) currentFirmChart.destroy();
-        currentFirmChart = new Chart(ctx, {
-            type: 'bar',
-            data: { labels: topFirms.map(f => f[0].length > 20 ? f[0].substring(0,18)+'..' : f[0]), datasets: [{ label: 'Toplam Arıza Sayısı', data: topFirms.map(f => f[1].total), backgroundColor: '#1E3A5F' }] },
-            options: { responsive: true, maintainAspectRatio: true }
-        });
+        currentFirmChart = new Chart(ctx, { type: 'bar', data: { labels: topFirms.map(f => f[0].length > 20 ? f[0].substring(0,18)+'..' : f[0]), datasets: [{ label: 'Toplam Arıza Sayısı', data: topFirms.map(f => f[1].total), backgroundColor: '#1E3A5F' }] }, options: { responsive: true, maintainAspectRatio: true } });
     }
     
     function renderMonthlyReport(monthKey) {
@@ -859,7 +760,7 @@
         document.getElementById("monthStats").innerHTML = `<div class="stat-card"><div class="stat-number">${total}</div><div>Toplam Arıza</div></div><div class="stat-card"><div class="stat-number">${completedCount}</div><div>Tamamlanan</div></div><div class="stat-card"><div class="stat-number">${pending}</div><div>Bekleyen</div></div>`;
         let tableBody = document.getElementById("monthlyFaultsBody");
         if (filtered.length === 0) tableBody.innerHTML = '<tr><td colspan="6">Bu dönemde kayıt yok</td></tr>';
-        else tableBody.innerHTML = filtered.map(f => `<td><td>${escapeHtml(f.tarih)}</td><td><span class="status-badge ${f.durum === 'Bekliyor' ? 'waiting' : (f.durum === 'İşlemde' ? 'progress' : 'completed')}">${f.durum}</span></td><td>${escapeHtml(f.firma)}</td><td>${escapeHtml(f.sehir)}</td><td>${escapeHtml(f.ariza || '-')}</td><td>${escapeHtml(f.teknisyen || '-')}</td></tr>`).join('');
+        else tableBody.innerHTML = filtered.map(f => `<tr><td>${escapeHtml(f.tarih)}</td><td><span class="status-badge ${f.durum === 'Bekliyor' ? 'waiting' : (f.durum === 'İşlemde' ? 'progress' : 'completed')}">${f.durum}</span></td><td>${escapeHtml(f.firma)}</td><td>${escapeHtml(f.sehir)}</td><td>${escapeHtml(f.ariza || '-')}</td><td>${escapeHtml(f.teknisyen || '-')}</td></tr>`).join('');
         let dailyMap = new Map();
         filtered.forEach(f => { if (f.tarih) dailyMap.set(f.tarih, (dailyMap.get(f.tarih) || 0) + 1); });
         let sortedDates = Array.from(dailyMap.keys()).sort();
@@ -871,45 +772,74 @@
         if (!monthKey) { firmContainer.style.display = "block"; renderFirmReportForAll(); } else { firmContainer.style.display = "none"; }
     }
 
+    // ---------- TEKNİSYEN MODAL ----------
     function openTeknisyenModal() { renderTeknisyenList(); document.getElementById("teknisyenModal").classList.add("active"); }
-    
     function renderTeknisyenList() {
         let div = document.getElementById("teknisyenListesi");
         if (!div) return;
         div.innerHTML = teknisyenler.map(t => `<div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>${escapeHtml(t.ad)} - ${t.tel}</span><button class="teknisyen-sil" data-id="${t.firebaseId}" style="background:red; color:white; border:none; border-radius:20px; padding:2px 10px;">Sil</button></div>`).join('');
-        document.querySelectorAll('.teknisyen-sil').forEach(btn => btn.addEventListener('click', () => {
-            let id = btn.getAttribute('data-id');
-            database.ref('teknisyenler/' + id).remove();
-        }));
-    }
-    
-    function saveTeknisyenlerToFirebase() {
-        // Teknisyenler zaten Firebase'den geliyor, ekleme/silme işlemleri doğrudan yapılıyor
+        document.querySelectorAll('.teknisyen-sil').forEach(btn => btn.addEventListener('click', () => database.ref('teknisyenler/' + btn.getAttribute('data-id')).remove()));
     }
 
-    // DOM yüklendiğinde
-    document.addEventListener("DOMContentLoaded", () => {
-        // Firebase verilerini dinlemeye başla
-        loadDataFromFirebase();
+    // ---------- FIREBASE VERİ AKIŞI ve ESKİ VERİLERİ AKTARMA ----------
+    let initialDataLoaded = false;
+    function loadDataFromFirebase() {
+        // Arızaları dinle
+        database.ref('faults').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                faultsArray = Object.keys(data).map(key => ({ ...data[key], firebaseId: key }));
+            } else {
+                faultsArray = [];
+            }
+            updateFirmalarFromFaults();
+            renderTables();
+            buildMonthSlicer();
+            if (document.getElementById("raporTab").classList.contains("active")) renderMonthlyReport(currentSelectedMonth);
+            
+            // Eğer hiç veri yoksa ve daha önce aktarma yapılmadıysa DEFAULT_FAULTS'u yükle
+            if (!initialDataLoaded && (!data || Object.keys(data).length === 0)) {
+                initialDataLoaded = true;
+                // Eski arıza kayıtlarını Firebase'e ekle
+                const promises = DEFAULT_FAULTS.map(fault => {
+                    const { id, ...cleanFault } = fault;  // id'yi kaldır, firebase otomatik üretsin
+                    return database.ref('faults').push(cleanFault);
+                });
+                Promise.all(promises).then(() => {
+                    console.log("29 adet eski arıza kaydı Firebase'e aktarıldı");
+                    const toast = document.getElementById('toast');
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 3000);
+                }).catch(err => console.error("Aktarma hatası:", err));
+            }
+        });
         
         // Teknisyenleri dinle
         database.ref('teknisyenler').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                teknisyenler = Object.keys(data).map(key => {
-                    return { ...data[key], firebaseId: key };
-                });
+                teknisyenler = Object.keys(data).map(key => ({ ...data[key], firebaseId: key }));
             } else {
                 teknisyenler = [];
             }
             updateTeknisyenDropdown();
             renderTables();
-            renderTeknisyenList(); // Modal açıkken güncellenebilir
+            
+            // Eğer teknisyen verisi yoksa varsayılanları ekle
+            if (!data || Object.keys(data).length === 0) {
+                const tekPromises = DEFAULT_TEKNISYENLER.map(t => {
+                    const { id, ...cleanT } = t;
+                    return database.ref('teknisyenler').push(cleanT);
+                });
+                Promise.all(tekPromises).then(() => console.log("Varsayılan teknisyenler eklendi"));
+            }
         });
-        
-        updateTeknisyenDropdown();
+    }
+
+    // ---------- DOM OLAY BAĞLAMALARI ----------
+    document.addEventListener("DOMContentLoaded", () => {
+        loadDataFromFirebase();
         attachSortListeners();
-        
         document.getElementById("newFaultBtn").addEventListener("click", newFault);
         document.getElementById("modalCancelBtn").addEventListener("click", closeFaultModal);
         document.getElementById("faultForm").addEventListener("submit", saveFault);
